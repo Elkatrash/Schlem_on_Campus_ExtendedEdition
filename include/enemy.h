@@ -6,6 +6,8 @@
 // Clamp a value within a range
 #define CLAMP(x, lower, upper) ((x) < (lower) ? (lower) : ((x) > (upper) ? (upper) : (x)))
 
+#define ENEMY_UPDATES_PER_FRAME 60
+
 typedef enum Visibility // To see if an enemy should be drawn on the screen or not
 {
     VISIBLE,
@@ -44,8 +46,8 @@ typedef struct Enemy // The enemy
     int hp;
     int dmg;
     int id;
-    int baseCoolDown; // reload time
-    int coolDown;     // how far along he is reloading
+    float baseCoolDown; // reload time
+    float coolDown;     // how far along he is reloading
     float acceleration;
     float maxSpeed;
     int friendlyProjectile; // If he happens to be a friendly flying object

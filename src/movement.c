@@ -248,8 +248,8 @@ void shootProjectile(Vec2 pos, Vec2 dir, int dmg, Enemy **projectiles, int *ppoi
     else
         *proj = EnemyPresets[E_PROJECTILE];
 
-    proj->acceleration *= MAXPROJECTILES;
-    proj->maxSpeed *= MAXPROJECTILES;
+    proj->acceleration *= ((float)MAXPROJECTILES / (float)PROJECTILE_UPDATES_PER_FRAME);
+    proj->maxSpeed *= ((float)MAXPROJECTILES / (float)PROJECTILE_UPDATES_PER_FRAME);
     proj->attackRadius = Sprites[proj->sprite].width / 2;
     proj->pos = pos;
     proj->dir = dir;

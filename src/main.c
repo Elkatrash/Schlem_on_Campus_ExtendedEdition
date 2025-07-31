@@ -14,7 +14,6 @@
 #define SCREEN_HEIGHT 1080
 #define MAP_WIDTH 10
 #define MAP_HEIGHT 10
-#define MAX_WALLS 1024
 #define NUM_RAYS 1920
 #define FOV 90.0f
 
@@ -427,12 +426,12 @@ int main(void)
                 gameState = DEATHSCREEN;
             }
 
-            updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls);
-
-            // updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls); // Yes we know it's a repeat. It looks better like this for now
+            for (int i = 0; i < ENEMY_UPDATES_PER_FRAME; i++)
+                updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls);
 
             drawWeapon(weapons, currentwpn);
-            updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
+            for (int i = 0; i < PROJECTILE_UPDATES_PER_FRAME; i++)
+                updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
 
             drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
 
