@@ -31,22 +31,6 @@ typedef enum EnemyType // To see what properties it should have
 
 } EnemyType;
 
-typedef enum SpriteNames
-{
-
-    ENEMY_MELEE,
-    ENEMY_MIDRANGE,
-    ENEMY_SNIPER,
-    ENEMY_PROJECTILE,
-    ENEMY_DEAD,
-
-    ALLY_HEALTH,
-    ALLY_AMMO,
-    ALLY_PROJECTILE,
-} SpriteNames;
-
-#define NUM_OF_SPRITES 8
-
 typedef struct Enemy // The enemy
 {
     Status status;         // Dead or no
@@ -69,8 +53,6 @@ typedef struct Enemy // The enemy
 } Enemy;
 
 extern const Enemy EnemyPresets[];
-extern const char *SpritePaths[];
-extern Texture2D Sprites[];
 
 typedef struct Map Map;
 

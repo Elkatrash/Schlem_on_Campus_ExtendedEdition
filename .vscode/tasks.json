@@ -13,6 +13,7 @@
                 "src/enemy.c",
                 "src/movement.c",
                 "src/raycast.c",
+                "src/sprites.c",
                 "-Iinclude",
                 "-Llib",
                 "-lraylib",

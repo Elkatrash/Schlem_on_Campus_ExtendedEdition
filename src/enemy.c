@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include "map.h"
+#include "sprites.h"
 
 #define PLACEHOLDERRADIUS 1.0f
 
@@ -404,15 +405,3 @@ const Enemy EnemyPresets[] = {
     }
 
 };
-
-Texture2D Sprites[NUM_OF_SPRITES] = {0};
-
-const char *SpritePaths[] = {
-    "Data/Sprites/MeleeNollantransp.png",
-    "Data/Sprites/MidrangeNollantransp.png",
-    "Data/Sprites/LongRangeNollan.png",
-    "Data/Sprites/Projectiles/EvilProjectile.png",
-    "Data/Sprites/Nollekorttransp.png",
-    "Data/Sprites/Health.png",
-    "Data/Sprites/Ammo.png",
-    "Data/Sprites/Projectiles/largerprojectiletransp.png"};

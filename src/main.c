@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "enemy.h"
+#include "sprites.h"
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -247,11 +248,6 @@ void drawWeapon(Weapon *wpns, int wpnid)
     }
 }
 
-// These are hud elements. They are global so that they don't have to be passed by reference or reloaded into graphics memory every time the hud is drawn
-Texture2D wpnslct1;
-Texture2D wpnslct2;
-Texture2D wpnslct3;
-Texture2D kngligDoomGuy;
 Font jupiter;
 
 void drawHud(Player player, Weapon wpn, int wpnn, int remaingingEnemies)
@@ -265,42 +261,42 @@ void drawHud(Player player, Weapon wpn, int wpnn, int remaingingEnemies)
 
     // Draw konglig doomguy
     Rectangle src = {
-        0, 0, kngligDoomGuy.width, kngligDoomGuy.height};
+        0, 0, Sprites[UI_GUY].width, Sprites[UI_GUY].height};
     Rectangle dest = {
-        (SCREEN_WIDTH - kngligDoomGuy.width * hudHeightScale) / 2,
-        SCREEN_HEIGHT - hudHeightScale * kngligDoomGuy.height,
-        kngligDoomGuy.width * hudHeightScale,
-        kngligDoomGuy.height * hudHeightScale};
-    DrawTexturePro(kngligDoomGuy, src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
+        (SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2,
+        SCREEN_HEIGHT - hudHeightScale * Sprites[UI_GUY].height,
+        Sprites[UI_GUY].width * hudHeightScale,
+        Sprites[UI_GUY].height * hudHeightScale};
+    DrawTexturePro(Sprites[UI_GUY], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
 
     // Make an offset to the right of konglig doomguy
-    src = (Rectangle){0, 0, wpnslct1.width, wpnslct1.height};
-    dest = (Rectangle){(SCREEN_WIDTH + kngligDoomGuy.width * hudHeightScale) / 2, SCREEN_HEIGHT - hudHeightScale * kngligDoomGuy.height, wpnslct1.width, wpnslct1.height};
+    src = (Rectangle){0, 0, Sprites[UI_SELECT1].width, Sprites[UI_SELECT1].height};
+    dest = (Rectangle){(SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2, SCREEN_HEIGHT - hudHeightScale * Sprites[UI_GUY].height, Sprites[UI_SELECT1].width, Sprites[UI_SELECT1].height};
 
     // Draw the corresponding weapon select sprite
     switch (wpnn)
     {
     case 0:
-        DrawTexturePro(wpnslct1, src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
+        DrawTexturePro(Sprites[UI_SELECT1], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
         break;
     case 1:
-        DrawTexturePro(wpnslct2, src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
+        DrawTexturePro(Sprites[UI_SELECT2], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
         break;
     case 2:
-        DrawTexturePro(wpnslct3, src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
+        DrawTexturePro(Sprites[UI_SELECT3], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
         break;
     default:
         break;
     }
     // make three black squares
-    DrawRectangle(((SCREEN_WIDTH + kngligDoomGuy.width * hudHeightScale) / 2) + wpnslct1.width + 4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 300, 90 * hudHeightScale - 8, BLACK);
-    DrawRectangle(((SCREEN_WIDTH - kngligDoomGuy.width * hudHeightScale) / 2) - 204, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 200, 90 * hudHeightScale - 8, BLACK);
+    DrawRectangle(((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 300, 90 * hudHeightScale - 8, BLACK);
+    DrawRectangle(((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 204, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 200, 90 * hudHeightScale - 8, BLACK);
     DrawRectangle(4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 450, 90 * hudHeightScale - 8, BLACK);
 
     // Draw some text in the squares
     char buffer[64];
     sprintf(buffer, "HP: %d", player.hp);
-    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH - kngligDoomGuy.width * hudHeightScale) / 2) - 200, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
+    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 200, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
 
     sprintf(buffer, "+");
     DrawText(buffer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 20, (Color){245, 40, 145, 204});
@@ -310,7 +306,7 @@ void drawHud(Player player, Weapon wpn, int wpnn, int remaingingEnemies)
     else
         sprintf(buffer, "AMMO: %d", wpn.ammo);
 
-    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH + kngligDoomGuy.width * hudHeightScale) / 2) + wpnslct1.width + 8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
+    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
 
     sprintf(buffer, "REMAINING 0an: %d", remaingingEnemies);
     DrawTextEx(jupiter, buffer, (Vector2){8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
@@ -324,16 +320,17 @@ int main(void)
     SetExitKey(KEY_BACKSPACE); // set close program key, so esc can be used for pause
     ToggleFullscreen();
     HideCursor();
+
+    initSprites();
+
     Player player = PLAYERINIT;
     GameState gameState = MAINMENU;
 
     // Load assets
     Map *mp = loadMap(Maps[0]);
+
     Font font = LoadFont("Data/Sprites/Fonts/setback.png");
-    wpnslct1 = LoadTexture("Data/Sprites/HUD/Weaponselect1.png");
-    wpnslct2 = LoadTexture("Data/Sprites/HUD/Weaponselect2.png");
-    wpnslct3 = LoadTexture("Data/Sprites/HUD/Weaponselect3.png");
-    kngligDoomGuy = LoadTexture("Data/Sprites/HUD/85ed57ab85bbe08a0edfd3cfa5edfc38.jpg");
+
     jupiter = LoadFont("Data/Sprites/HUD/fonts/jupiter_crash.png");
     Image floorImage = GenImageColor(SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     Texture2D floorTextureBuffer = LoadTextureFromImage(floorImage);

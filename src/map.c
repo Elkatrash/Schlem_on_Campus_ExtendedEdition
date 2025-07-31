@@ -7,6 +7,7 @@
 #include "movement.h"
 #include "raycast.h"
 #include "enemy.h"
+#include "sprites.h"
 
 const char *Maps[] = {
     "Data/Maps/map1.csv",
@@ -45,10 +46,6 @@ int addEnemy(FILE *map, Vec2 pos, int id, EnemyType type)
 
 Map *loadMap(const char *filename)
 {
-    for (int i = 0; i < NUM_OF_SPRITES; i++)
-    {
-        Sprites[i] = LoadTexture(SpritePaths[i]);
-    }
 
     // Opening file
     FILE *mfile = fopen(filename, "r");
@@ -106,14 +103,10 @@ Map *loadMap(const char *filename)
     // read the first lines as walls. Loads coordinates and textures
     for (int i = 0; i < nwalls && fgets(buffer, sizeof(buffer), mfile); i++)
     {
-        char textbuff[64];
+        int wallSprite;
         // Read the wall data
-        sscanf(buffer, "%f,%f,%f,%f,%63s", &result->walls[i].start.x, &result->walls[i].start.y, &result->walls[i].stop.x, &result->walls[i].stop.y, textbuff);
-        result->walls[i].texture = LoadTexture(textbuff); // Load the texture
-        if (result->walls[i].texture.id == 0)
-        {
-            printf("Failed to load texture %s \n", textbuff);
-        }
+        sscanf(buffer, "%f,%f,%f,%f,%d", &result->walls[i].start.x, &result->walls[i].start.y, &result->walls[i].stop.x, &result->walls[i].stop.y, &wallSprite);
+        result->walls[i].texture = Sprites[wallSprite];
     }
     // Read the remaining lines as enemies. Loads attributes and sets som default attributes and also loads sprite.
     for (int i = 0; i < nenemy && fgets(buffer, sizeof(buffer), mfile) && nenemy; i++)

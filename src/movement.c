@@ -3,6 +3,7 @@
 #include "movement.h"
 #include "enemy.h"
 #include "map.h"
+#include "sprites.h"
 
 void wishMoveForward(Player *player)
 {
