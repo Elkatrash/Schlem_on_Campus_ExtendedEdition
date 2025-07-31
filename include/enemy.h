@@ -25,8 +25,27 @@ typedef enum EnemyType // To see what properties it should have
     MIDRANGE,
     SNIPER,
     HEALTH,
-    AMMO
+    AMMO,
+    F_PROJECTILE,
+    E_PROJECTILE,
+
 } EnemyType;
+
+typedef enum SpriteNames
+{
+
+    ENEMY_MELEE,
+    ENEMY_MIDRANGE,
+    ENEMY_SNIPER,
+    ENEMY_PROJECTILE,
+    ENEMY_DEAD,
+
+    ALLY_HEALTH,
+    ALLY_AMMO,
+    ALLY_PROJECTILE,
+} SpriteNames;
+
+#define NUM_OF_SPRITES 8
 
 typedef struct Enemy // The enemy
 {
@@ -34,7 +53,7 @@ typedef struct Enemy // The enemy
     Visibility visibility; // Visible or no
     float hitRadius;       // How girthy is the enemy
     float attackRadius;    // How far away can he attack
-    Texture2D sprite;      // How does he look
+    unsigned int sprite;   // How does he look
     Vec2 pos;              // You're a fart smeller you can figure out some of theese yourself
     Vec2 dir;
     Vec2 velocity;
@@ -48,6 +67,10 @@ typedef struct Enemy // The enemy
     int friendlyProjectile; // If he happens to be a friendly flying object
     int type;
 } Enemy;
+
+extern const Enemy EnemyPresets[];
+extern const char *SpritePaths[];
+extern Texture2D Sprites[];
 
 typedef struct Map Map;
 

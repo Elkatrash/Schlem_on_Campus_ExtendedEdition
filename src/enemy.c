@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "map.h"
 
+#define PLACEHOLDERRADIUS 1.0f
+
 int inFieldOfView(Vec2 playerpos, Vec2 playerdir, float fov, Enemy foe1)
 {
     Vec2 toEnemy;
@@ -13,7 +15,7 @@ int inFieldOfView(Vec2 playerpos, Vec2 playerdir, float fov, Enemy foe1)
         return 1; // Player is on top of the enemy — it's visible
 
     // Angle offset from enemy center to its edge (projected angle)
-    float spriteHalfAngle = atanf(foe1.sprite.width / (2.0f * distance));
+    float spriteHalfAngle = atanf(Sprites[foe1.sprite].width / (2.0f * distance));
 
     // Normalize direction to enemy
     Vec2 toEnemyNorm = toEnemy;
@@ -48,7 +50,7 @@ CollisionData **rayShotEnemies(Player p1, float fov, Map *mp, Enemy *enemies, in
         result[i]->d = diff;
         result[i]->position = enemies[i].pos;
         result[i]->angle = vectorDot(p1.dir, diffvec); // well be using the cos of the angle later and since both of the vectors are normalized this is the cos of the angle
-        result[i]->texture = enemies[i].sprite;
+        result[i]->texture = Sprites[enemies[i].sprite];
         result[i]->textureOffset = NAN;
     }
     return result;
@@ -87,7 +89,7 @@ CollisionData **rayShotPlayer(Enemy foe, Player p1, Map *mp)
     result[0]->d = diff;
     result[0]->position = foe.pos;
     result[0]->angle = RAD_TO_DEG(acosf(vectorDot(p1.dir, diffvec)));
-    result[0]->texture = foe.sprite;
+    result[0]->texture = Sprites[foe.sprite];
 
     return result;
 }
@@ -154,12 +156,12 @@ void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int 
     if (foe->hp <= 0)
     { // Check if enemy should be dead
         foe->status = DEAD;
-        if (foe->type == 3 | foe->type == 4)
+        if ((foe->type == 3) || (foe->type == 4))
         {
             foe->visibility = INVISIBLE; // Health packs and ammo are invisible when dead
             return;
         }
-        foe->sprite = LoadTexture("Sprites/Nollekorttransp.png"); // Nollan becomes nollekort.
+        foe->sprite = ENEMY_DEAD; // Nollan becomes nollekort.
         return;
     }
 
@@ -265,3 +267,152 @@ int countHostiles(Map *mp)
     }
     return result;
 }
+
+const Enemy EnemyPresets[] = {
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        PLACEHOLDERRADIUS, // hitradius
+        40.0,              // attackradius
+        ENEMY_MELEE,       // sprite
+        VECINIT,           // pos
+        (Vec2){0.0, 1.0},  // dir
+        VECINIT,           // velocity
+        70,                // hp
+        3,                 // dmg
+        0,                 // id
+        30,                // baseCooldown
+        0,                 // cooldown
+        300,               // acceleration
+        1200,              // maxSpeed
+        -1,                // friendlyProjectile
+        MELEE,             // type
+    },
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        PLACEHOLDERRADIUS, // hitradius
+        330.0,             // attackradius
+        ENEMY_MIDRANGE,    // sprite
+        VECINIT,           // pos
+        (Vec2){0.0, 1.0},  // dir
+        VECINIT,           // velocity
+        100,               // hp
+        20,                // dmg
+        0,                 // id
+        240,               // baseCooldown
+        0,                 // cooldown
+        100,               // acceleration
+        400,               // maxSpeed
+        -1,                // friendlyProjectile
+        MIDRANGE,          // type
+    },
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        PLACEHOLDERRADIUS, // hitradius
+        600.0,             // attackradius
+        ENEMY_SNIPER,      // sprite
+        VECINIT,           // pos
+        (Vec2){0.0, 1.0},  // dir
+        VECINIT,           // velocity
+        50,                // hp
+        35,                // dmg
+        0,                 // id
+        300,               // baseCooldown
+        0,                 // cooldown
+        100,               // acceleration
+        400,               // maxSpeed
+        -1,                // friendlyProjectile
+        SNIPER,            // type
+    },
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        PLACEHOLDERRADIUS, // hitradius
+        50.0,              // attackradius
+        ALLY_HEALTH,       // sprite
+        VECINIT,           // pos
+        (Vec2){0.0, 1.0},  // dir
+        VECINIT,           // velocity
+        INT_MAX,           // hp
+        -20,               // dmg
+        0,                 // id
+        0,                 // baseCooldown
+        0,                 // cooldown
+        0,                 // acceleration
+        0,                 // maxSpeed
+        -1,                // friendlyProjectile
+        HEALTH,            // type
+    },
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        PLACEHOLDERRADIUS, // hitradius
+        50.0,              // attackradius
+        ALLY_AMMO,         // sprite
+        VECINIT,           // pos
+        (Vec2){0.0, 1.0},  // dir
+        VECINIT,           // velocity
+        INT_MAX,           // hp
+        0,                 // dmg
+        0,                 // id
+        0,                 // baseCooldown
+        0,                 // cooldown
+        0,                 // acceleration
+        0,                 // maxSpeed
+        -1,                // friendlyProjectile
+        AMMO,              // type
+    },
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        0,                 // hitradius
+        PLACEHOLDERRADIUS, // attackradius
+        ALLY_PROJECTILE,   // sprite
+        VECINIT,           // pos
+        VECINIT,           // dir
+        VECINIT,           // velocity
+        1,                 // hp
+        0,                 // dmg
+        -1,                // id
+        0,                 // baseCooldown
+        0,                 // cooldown
+        2000,              // acceleration
+        4000,              // maxSpeed
+        1,                 // friendlyProjectile
+        F_PROJECTILE,      // type
+    },
+    {
+        ALIVE,             // Status
+        VISIBLE,           // visibility
+        0,                 // hitradius
+        PLACEHOLDERRADIUS, // attackradius
+        ENEMY_PROJECTILE,  // sprite
+        VECINIT,           // pos
+        VECINIT,           // dir
+        VECINIT,           // velocity
+        1,                 // hp
+        0,                 // dmg
+        -1,                // id
+        0,                 // baseCooldown
+        0,                 // cooldown
+        2000,              // acceleration
+        4000,              // maxSpeed
+        0,                 // friendlyProjectile
+        E_PROJECTILE,      // type
+    }
+
+};
+
+Texture2D Sprites[NUM_OF_SPRITES] = {0};
+
+const char *SpritePaths[] = {
+    "Data/Sprites/MeleeNollantransp.png",
+    "Data/Sprites/MidrangeNollantransp.png",
+    "Data/Sprites/LongRangeNollan.png",
+    "Data/Sprites/Projectiles/EvilProjectile.png",
+    "Data/Sprites/Nollekorttransp.png",
+    "Data/Sprites/Health.png",
+    "Data/Sprites/Ammo.png",
+    "Data/Sprites/Projectiles/largerprojectiletransp.png"};

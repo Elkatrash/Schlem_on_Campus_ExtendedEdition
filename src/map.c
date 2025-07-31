@@ -8,6 +8,12 @@
 #include "raycast.h"
 #include "enemy.h"
 
+const char *Maps[] = {
+    "Data/Maps/map1.csv",
+    "Data/Maps/map2.csv",
+    "Data/Maps/Map3.csv",
+    "Data/Maps/Map4.csv"};
+
 FILE *newMap(const char *filename)
 {
     return fopen(filename, "w"); // It's not the size of the function that matters
@@ -39,6 +45,11 @@ int addEnemy(FILE *map, Vec2 pos, int id, EnemyType type)
 
 Map *loadMap(const char *filename)
 {
+    for (int i = 0; i < NUM_OF_SPRITES; i++)
+    {
+        Sprites[i] = LoadTexture(SpritePaths[i]);
+    }
+
     // Opening file
     FILE *mfile = fopen(filename, "r");
     if (!mfile)
@@ -108,80 +119,18 @@ Map *loadMap(const char *filename)
     for (int i = 0; i < nenemy && fgets(buffer, sizeof(buffer), mfile) && nenemy; i++)
     {
         int type;
+        int id;
+        float x;
+        float y;
         // Read pos, id, and type from file
-        sscanf(buffer, "%f,%f,%d,%d", &result->enemies[i].pos.x, &result->enemies[i].pos.y, &result->enemies[i].id, &type);
+        sscanf(buffer, "%f,%f,%d,%d", &x, &y, &id, &type);
 
-        switch (type)
-        {
-        case 0: // Creates a melee enemy
-            result->enemies[i].sprite = LoadTexture("Sprites/MeleeNollantransp.png");
-            result->enemies[i].attackRadius = 40.0;
-            result->enemies[i].dmg = 3;
-            result->enemies[i].hp = 70;
-            result->enemies[i].baseCoolDown = 30;
-            result->enemies[i].acceleration = 300;
-            result->enemies[i].maxSpeed = 1200;
-            result->enemies[i].type = 0;
-
-            break;
-        case 1: // Creates a midrange enemy
-            result->enemies[i].sprite = LoadTexture("Sprites/MidrangeNollantransp.png");
-            result->enemies[i].attackRadius = 330.0;
-            result->enemies[i].dmg = 20;
-            result->enemies[i].hp = 100;
-            result->enemies[i].baseCoolDown = 240;
-            result->enemies[i].acceleration = 100;
-            result->enemies[i].maxSpeed = 400;
-            result->enemies[i].type = 1;
-
-            break;
-        case 2: // Creates a long range enemy
-            result->enemies[i].sprite = LoadTexture("Sprites/LongRangeNollan.png");
-            result->enemies[i].attackRadius = 600.0;
-            result->enemies[i].dmg = 35;
-            result->enemies[i].hp = 50;
-            result->enemies[i].baseCoolDown = 300;
-            result->enemies[i].acceleration = 100;
-            result->enemies[i].maxSpeed = 400;
-            result->enemies[i].type = 2;
-
-            break;
-        case 3: // Creates a health pickup
-            result->enemies[i].sprite = LoadTexture("Sprites/Health.png");
-            result->enemies[i].attackRadius = 50.0;
-            result->enemies[i].dmg = -20;
-            result->enemies[i].hp = INT_MAX;
-            result->enemies[i].baseCoolDown = 0;
-            result->enemies[i].acceleration = 0;
-            result->enemies[i].maxSpeed = 0;
-            result->enemies[i].type = 3;
-
-            break;
-        case 4: // Creates a ammo pickup
-            result->enemies[i].sprite = LoadTexture("Sprites/Ammo.png");
-            result->enemies[i].attackRadius = 50.0;
-            result->enemies[i].dmg = 0;
-            result->enemies[i].hp = INT_MAX;
-            result->enemies[i].baseCoolDown = 0;
-            result->enemies[i].acceleration = 0;
-            result->enemies[i].maxSpeed = 0;
-            result->enemies[i].type = 4;
-
-            break;
-        default:
-            printf("Invalid enemy type\n");
-            break;
-        }
-        // Common for all enemies
-        result->enemies[i].coolDown = 0;
-        result->enemies[i].status = ALIVE;
-        result->enemies[i].visibility = VISIBLE;
-        result->enemies[i].velocity = VECINIT;
-        result->enemies[i].dir = (Vec2){0.0, 1.0};
-        result->enemies[i].hitRadius = (result->enemies[i].sprite.width * 16) / 64;
+        result->enemies[i] = EnemyPresets[type];
+        result->enemies[i].id = id;
+        result->enemies[i].pos = (Vec2){x, y};
+        result->enemies[i].hitRadius = (Sprites[result->enemies[i].sprite].width * 16) / 64;
         result->enemies[i].acceleration *= nenemy;
         result->enemies[i].maxSpeed *= nenemy;
-        result->enemies[i].friendlyProjectile = -1;
     }
 
     result->projectiles = malloc(MAXPROJECTILES * sizeof(Enemy *));

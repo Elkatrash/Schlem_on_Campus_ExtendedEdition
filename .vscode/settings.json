@@ -3,6 +3,7 @@
         "raylib.h": "c",
         "algorithm": "c",
         "format": "c",
-        "movement.h": "c"
+        "movement.h": "c",
+        "stdio.h": "c"
     }
 }

@@ -16,7 +16,6 @@
 #define MAX_WALLS 1024
 #define NUM_RAYS 200
 #define FOV 60.0f
-#define NUM_MAPS 4
 
 typedef enum
 {
@@ -27,12 +26,6 @@ typedef enum
     DEATHSCREEN,
     THEEND
 } GameState;
-
-const char *Maps[] = {
-    "Maps/map1.csv",
-    "Maps/map2.csv",
-    "Maps/Map3.csv",
-    "Maps/Map4.csv"};
 
 Color CERISE = {230, 65, 133, 255};
 
@@ -335,17 +328,17 @@ int main(void)
     GameState gameState = MAINMENU;
 
     // Load assets
-    Map *mp = loadMap("Maps/map1.csv");
-    Font font = LoadFont("Sprites/Fonts/setback.png");
-    wpnslct1 = LoadTexture("Sprites/HUD/Weaponselect1.png");
-    wpnslct2 = LoadTexture("Sprites/HUD/Weaponselect2.png");
-    wpnslct3 = LoadTexture("Sprites/HUD/Weaponselect3.png");
-    kngligDoomGuy = LoadTexture("Sprites/HUD/85ed57ab85bbe08a0edfd3cfa5edfc38.jpg");
-    jupiter = LoadFont("Sprites/HUD/fonts/jupiter_crash.png");
+    Map *mp = loadMap(Maps[0]);
+    Font font = LoadFont("Data/Sprites/Fonts/setback.png");
+    wpnslct1 = LoadTexture("Data/Sprites/HUD/Weaponselect1.png");
+    wpnslct2 = LoadTexture("Data/Sprites/HUD/Weaponselect2.png");
+    wpnslct3 = LoadTexture("Data/Sprites/HUD/Weaponselect3.png");
+    kngligDoomGuy = LoadTexture("Data/Sprites/HUD/85ed57ab85bbe08a0edfd3cfa5edfc38.jpg");
+    jupiter = LoadFont("Data/Sprites/HUD/fonts/jupiter_crash.png");
     Image floorImage = GenImageColor(SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     Texture2D floorTextureBuffer = LoadTextureFromImage(floorImage);
-    Image floorTexture = LoadImage("Sprites/Ground.png");
-    Image roofTexture = LoadImage("Sprites/Sky.png");
+    Image floorTexture = LoadImage("Data/Sprites/Ground.png");
+    Image roofTexture = LoadImage("Data/Sprites/Sky.png");
 
     Weapon *weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
 

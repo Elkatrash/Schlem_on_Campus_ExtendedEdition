@@ -205,7 +205,7 @@ CollisionData **rayShotProjectile(Player p1, float fov, Map *mp, Enemy **project
         result[i]->d = diff;
         result[i]->position = projectiles[i]->pos;
         result[i]->angle = vectorDot(p1.dir, diffvec); // we'll be using the cos of the angle later and since both of the vectors are normalized this is the cos of the angle
-        result[i]->texture = projectiles[i]->sprite;
+        result[i]->texture = Sprites[projectiles[i]->sprite];
         result[i]->textureOffset = NAN;
     }
     return result;
@@ -243,28 +243,16 @@ void shootProjectile(Vec2 pos, Vec2 dir, int dmg, Enemy **projectiles, int *ppoi
     // Make an enemy object
 
     if (friendly)
-        proj->sprite = LoadTexture("Sprites/Projectiles/largerprojectiletransp.png");
+        *proj = EnemyPresets[F_PROJECTILE];
     else
-        proj->sprite = LoadTexture("Sprites/Projectiles/EvilProjectile.png");
+        *proj = EnemyPresets[E_PROJECTILE];
 
-    proj->acceleration = 2000.0 * MAXPROJECTILES;
-    proj->attackRadius = proj->sprite.width / 2;
-    proj->baseCoolDown = 0;
-    proj->coolDown = 0;
+    proj->acceleration *= MAXPROJECTILES;
+    proj->maxSpeed *= MAXPROJECTILES;
+    proj->attackRadius = Sprites[proj->sprite].width / 2;
+    proj->pos = pos;
     proj->dir = dir;
     proj->dmg = dmg;
-    proj->hitRadius = 0;
-    proj->hp = 1;
-    proj->id = -1;
-    proj->maxSpeed = 4000.0 * MAXPROJECTILES;
-    proj->pos = pos;
-    Vec2 offset;
-    vectorScale(dir, 20.0, &offset);
-    vectorAdd(proj->pos, offset, &proj->pos);
-    proj->status = ALIVE;
-    proj->velocity = VECINIT;
-    proj->visibility = VISIBLE;
-    proj->friendlyProjectile = friendly;
 
     // Try to slot in the object somewhere
     int fl = 1;
@@ -378,8 +366,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
         return NULL;
 
     // Make the fist weapon
-    wps[0].normalSprite = LoadTexture("Sprites/Weapons/Fist1transp.png");
-    wps[0].shootingSprite = LoadTexture("Sprites/Weapons/Fist2transp.png");
+    wps[0].normalSprite = LoadTexture("Data/Sprites/Weapons/Fist1transp.png");
+    wps[0].shootingSprite = LoadTexture("Data/Sprites/Weapons/Fist2transp.png");
     wps[0].baseCooldown = 15;
     wps[0].currentCooldown = 0;
     wps[0].screenPos = (Vec2){width * 0.5, 0};
@@ -392,8 +380,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[0].dmg = 30;
 
     // Make the smg
-    wps[1].normalSprite = LoadTexture("Sprites/Weapons/kpisttransp.png");
-    wps[1].shootingSprite = LoadTexture("Sprites/Weapons/kpist2transp.png");
+    wps[1].normalSprite = LoadTexture("Data/Sprites/Weapons/kpisttransp.png");
+    wps[1].shootingSprite = LoadTexture("Data/Sprites/Weapons/kpist2transp.png");
     wps[1].baseCooldown = 15;
     wps[1].currentCooldown = 0;
     wps[1].screenPos = (Vec2){width / 5.0, 0};
@@ -406,8 +394,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[1].dmg = 20;
 
     // Make the pie
-    wps[2].normalSprite = LoadTexture("Sprites/Weapons/Projectile1transp.png");
-    wps[2].shootingSprite = LoadTexture("Sprites/Weapons/Fist2transp.png");
+    wps[2].normalSprite = LoadTexture("Data/Sprites/Weapons/Projectile1transp.png");
+    wps[2].shootingSprite = LoadTexture("Data/Sprites/Weapons/Fist2transp.png");
     wps[2].baseCooldown = 15;
     wps[2].currentCooldown = 0;
     wps[2].screenPos = (Vec2){width * 0.5, 0};
