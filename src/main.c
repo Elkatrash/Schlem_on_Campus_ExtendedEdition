@@ -15,8 +15,8 @@
 #define MAP_WIDTH 10
 #define MAP_HEIGHT 10
 #define MAX_WALLS 1024
-#define NUM_RAYS 200
-#define FOV 60.0f
+#define NUM_RAYS 1920
+#define FOV 90.0f
 
 typedef enum
 {
@@ -174,15 +174,13 @@ void drawScene(Player p1, CollisionData **enemyColl, int enemycount, CollisionDa
         {
 
             float dist = allData[c]->d;
-            float corrected = dist * cosf(DEG_TO_RAD(allData[c]->angle)); // Correct fisheye effect
-            float wallHeight = ((TILE_SIZE * SCREEN_HEIGHT) / corrected); // Wall height based on screen size
+            float corrected = dist * vectorDot(allData[c]->rayDir, p1.dir); // Correct fisheye effect
+            float wallHeight = ((TILE_SIZE * SCREEN_HEIGHT) / corrected);   // Wall height based on screen size
 
             Texture2D texture = allData[c]->texture;
 
             float sliceWidth = (float)SCREEN_WIDTH / NUM_RAYS;
             float screenX = allData[c]->id * sliceWidth;
-            float wallTop = (SCREEN_HEIGHT / 2.0f) - (wallHeight / 2.0f);
-            float wallBottom = wallTop + wallHeight;
 
             // --- Draw walls ---
             float texX = allData[c]->textureOffset * texture.width;
@@ -314,8 +312,8 @@ void drawHud(Player player, Weapon wpn, int wpnn, int remaingingEnemies)
 
 int main(void)
 {
-    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Raycasting in raylib");
-    SetTargetFPS(60);
+    InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Schlem on Campus");
+    SetTargetFPS(120);
     srand(time(NULL));
     SetExitKey(KEY_BACKSPACE); // set close program key, so esc can be used for pause
     ToggleFullscreen();
@@ -334,14 +332,13 @@ int main(void)
     jupiter = LoadFont("Data/Sprites/HUD/fonts/jupiter_crash.png");
     Image floorImage = GenImageColor(SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     Texture2D floorTextureBuffer = LoadTextureFromImage(floorImage);
-    Image floorTexture = LoadImage("Data/Sprites/Ground.png");
-    Image roofTexture = LoadImage("Data/Sprites/Sky.png");
+    Image floorTexture = LoadImageFromTexture(Sprites[MAP_FLOOR]);
+    Image roofTexture = LoadImageFromTexture(Sprites[MAP_CEILING]);
 
     Weapon *weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
 
     int currentMap = 0;
     int currentwpn = 0;
-    int totalEnemies;
     int remainingEnemies = 0;
     const char *exit = "Exit game [ Backspace ]";
     const char *ret = "Main Menu [ Esc ]";
@@ -357,6 +354,8 @@ int main(void)
 
         CollisionData **projectileData = rayShotProjectile(player, FOV, mp, mp->projectiles); // Gets projectile CollisionData
 
+        drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
+
         // Switch between the different states
         switch (gameState)
         {
@@ -369,13 +368,11 @@ int main(void)
                 player.dir = (Vec2){0.0, 1.0};
                 freeMap(mp);
                 mp = loadMap(Maps[currentMap]); // This is very inefficient, but I don't know how to reset a map in a better way
-                totalEnemies = countHostiles(mp);
                 weapons[2].projectiles = mp->projectiles;
                 currentwpn = 0;
             }
 
             rotate(&player.dir, ROTSPEED / 10);
-            drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
             // Show main menu
             const char *title = "Schlem on Campus";
             const char *start = "Start Game [ Enter ]";
@@ -430,11 +427,9 @@ int main(void)
                 gameState = DEATHSCREEN;
             }
 
-            drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
-
             updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls);
 
-            updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls); // Yes we know it's a repeat. It looks better like this for now
+            // updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls); // Yes we know it's a repeat. It looks better like this for now
 
             drawWeapon(weapons, currentwpn);
             updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
@@ -458,7 +453,6 @@ int main(void)
             }
 
             // Draw level in background
-            drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
             drawWeapon(weapons, currentwpn);
             drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
             // Show pause menu
@@ -497,7 +491,6 @@ int main(void)
 
                 freeMap(mp);                    // Unload old map
                 mp = loadMap(Maps[currentMap]); // load next Map
-                totalEnemies = mp->enemyCount;
                 weapons[2].projectiles = mp->projectiles;
                 currentwpn = 0;
 
@@ -506,7 +499,6 @@ int main(void)
             }
 
             // Draw level in background
-            drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
             drawWeapon(weapons, currentwpn);
             drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
             // Show end of level screen
@@ -536,7 +528,6 @@ int main(void)
 
                 freeMap(mp);                    // Unload old map
                 mp = loadMap(Maps[currentMap]); // load next Map
-                totalEnemies = mp->enemyCount;
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
                 currentwpn = 0;
 
@@ -545,7 +536,6 @@ int main(void)
             }
 
             // Draw level in background
-            drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
             drawWeapon(weapons, currentwpn);
             drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
             // Show death screen
@@ -568,7 +558,6 @@ int main(void)
             }
 
             // Draw level in background
-            drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
             drawWeapon(weapons, currentwpn);
             drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
             // Show end screen

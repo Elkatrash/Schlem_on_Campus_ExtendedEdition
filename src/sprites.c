@@ -13,6 +13,10 @@ int initSprites()
 
 void destroySprites()
 {
+    for (int i = 0; i < NUM_OF_SPRITES; i++)
+    {
+        UnloadTexture(Sprites[i]);
+    }
     return;
 }
 

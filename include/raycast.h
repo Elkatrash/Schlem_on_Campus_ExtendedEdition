@@ -43,7 +43,8 @@ typedef struct Map Map; // Because Map is defined elsewhere
 
 typedef struct
 {
-    Vec2 position;       // where the collision happened
+    Vec2 position; // where the collision happened
+    Vec2 rayDir;
     float d;             // how far away it happened
     float angle;         // used when firing multiple rays to determine the angle from the source.
     Texture2D texture;   // the texture of the thing that was collided with
