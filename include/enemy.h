@@ -6,6 +6,8 @@
 // Clamp a value within a range
 #define CLAMP(x, lower, upper) ((x) < (lower) ? (lower) : ((x) > (upper) ? (upper) : (x)))
 
+#define ENEMY_UPDATES_PER_FRAME 60
+
 typedef enum Visibility // To see if an enemy should be drawn on the screen or not
 {
     VISIBLE,
@@ -25,7 +27,10 @@ typedef enum EnemyType // To see what properties it should have
     MIDRANGE,
     SNIPER,
     HEALTH,
-    AMMO
+    AMMO,
+    F_PROJECTILE,
+    E_PROJECTILE,
+
 } EnemyType;
 
 typedef struct Enemy // The enemy
@@ -34,20 +39,22 @@ typedef struct Enemy // The enemy
     Visibility visibility; // Visible or no
     float hitRadius;       // How girthy is the enemy
     float attackRadius;    // How far away can he attack
-    Texture2D sprite;      // How does he look
+    unsigned int sprite;   // How does he look
     Vec2 pos;              // You're a fart smeller you can figure out some of theese yourself
     Vec2 dir;
     Vec2 velocity;
     int hp;
     int dmg;
     int id;
-    int baseCoolDown; // reload time
-    int coolDown;     // how far along he is reloading
+    float baseCoolDown; // reload time
+    float coolDown;     // how far along he is reloading
     float acceleration;
     float maxSpeed;
     int friendlyProjectile; // If he happens to be a friendly flying object
     int type;
 } Enemy;
+
+extern const Enemy EnemyPresets[];
 
 typedef struct Map Map;
 

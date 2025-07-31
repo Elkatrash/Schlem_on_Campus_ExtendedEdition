@@ -5,6 +5,9 @@
 #ifndef MAPH
 #define MAPH
 
+#define NUM_MAPS 4
+extern const char *Maps[];
+
 typedef enum EnemyType EnemyType;
 
 typedef struct Wall

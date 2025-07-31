@@ -4,11 +4,11 @@
 // player maxhp
 #define MAXHP 100
 #define STARTPOS (Vec2){0.0, 0.0}
-#define MAXSPEED 320
+#define MAXSPEED 420 // lol
 #define MAXPROJECTILES 30
-
+#define PROJECTILE_UPDATES_PER_FRAME 10
 // How fast character rotates
-#define ROTSPEED PI / 120
+#define ROTSPEED PI / 80
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -21,7 +21,7 @@ typedef struct
 {
     Vec2 n;
     Vec2 a;
-} Line; //n = dir, a = offset
+} Line; // n = dir, a = offset
 
 typedef struct Enemy Enemy;
 
@@ -57,7 +57,8 @@ typedef struct
     int hp;
 } Player;
 
-#define PLAYERINIT (Player){STARTPOS, (Vec2){0.0, 1.0}, VECINIT, VECINIT, MAXHP}
+#define PLAYERINIT \
+    (Player) { STARTPOS, (Vec2){0.0, 1.0}, VECINIT, VECINIT, MAXHP }
 
 // add forwards to the wish vector
 void wishMoveForward(Player *player);

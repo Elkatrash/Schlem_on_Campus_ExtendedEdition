@@ -117,7 +117,7 @@ int solveSystem(Vec2 v1, Vec2 v2, Vec2 v3, Vec2 *result)
 
     return 1;
 }
-
+/*
 CollisionData **multiRayShot(Vec2 campos, Vec2 camdir, float fov, int wn, Wall *walls, int rn)
 {
     float step = fov / (rn - 1);    // Devide the FOV into equal slices
@@ -153,10 +153,58 @@ CollisionData **multiRayShot(Vec2 campos, Vec2 camdir, float fov, int wn, Wall *
         {
             result[i]->angle = start + i * step; // Give the data an angle relative to the player direction
             result[i]->id = i;                   // Give the data an id
+            result[i]->rayDir = camdir;
         }
         rotate(&camdir, DEG_TO_RAD(step)); // Rotate camera
     }
     rotate(&camdir, DEG_TO_RAD(start)); // Rotate camera back to original direction
+    return result;
+}*/
+CollisionData **multiRayShot(Vec2 campos, Vec2 camdir, float fov, int wn, Wall *walls, int rn)
+{
+    CollisionData **result = malloc(rn * sizeof(CollisionData *));
+    if (!result)
+        return NULL;
+
+    // Normalize camera direction
+    normalize(&camdir);
+
+    // Camera plane based on FOV
+    Vec2 plane = {
+        -camdir.y * tanf(DEG_TO_RAD(fov / 2)),
+        camdir.x * tanf(DEG_TO_RAD(fov / 2))};
+
+    for (int i = 0; i < rn; i++)
+    {
+        float cameraX = 2.0f * i / (float)(rn - 1) - 1.0f; // Ranges from -1 to +1
+
+        // Compute ray direction
+        Vec2 rayDir = {
+            camdir.x + plane.x * cameraX,
+            camdir.y + plane.y * cameraX};
+        normalize(&rayDir);
+
+        result[i] = NULL;
+
+        for (int j = 0; j < wn; j++)
+        {
+            CollisionData *temp = checkCollision(walls[j], (Ray3D){campos, rayDir});
+            if (temp && (!result[i] || result[i]->d > temp->d))
+            {
+                if (!result[i])
+                    result[i] = malloc(sizeof(CollisionData));
+                if (result[i])
+                    *result[i] = *temp;
+            }
+        }
+
+        if (result[i])
+        {
+            result[i]->rayDir = rayDir; // Needed for dot() correction
+            result[i]->id = i;
+        }
+    }
+
     return result;
 }
 
