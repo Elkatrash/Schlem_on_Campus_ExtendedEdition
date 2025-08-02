@@ -1,5 +1,4 @@
 #include "raycast.h"
-#include "raylib.h"
 
 // player maxhp
 #define MAXHP 100
