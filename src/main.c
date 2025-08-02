@@ -159,37 +159,36 @@ int main(void)
                 player.dir = (Vec2){0.0, 1.0};
 
                 // Free data before mp changes in order to avoid memory leaks and segmentation faults
+                /*
                 freeCollisionData(hits, NUM_RAYS);
                 freeCollisionData(enemyData, mp->enemyCount);
                 freeCollisionData(projectileData, MAXPROJECTILES);
-                EndDrawing();
+                EndDrawing();*/
 
                 freeMap(mp);                    // Unload old map
                 mp = loadMap(Maps[currentMap]); // load next Map
                 weapons[2].projectiles = mp->projectiles;
                 currentwpn = 0;
 
-                continue; // Only one should be needed
-                break;    // Extra just in case
+                // continue; // Only one should be needed
+                break; // Extra just in case
             }
 
             break;
 
         case DEATHSCREEN:
-            if (IsKeyPressed(KEY_ESCAPE))
-            {
-                gameState = MAINMENU;
-            }
-            if (IsKeyPressed(KEY_ENTER))
+            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE))
             {
                 currentMap = 0; // Advance to next map
-                gameState = GAMEPLAY;
+
+                gameState = (IsKeyPressed(KEY_ESCAPE)) ? MAINMENU : GAMEPLAY;
                 player = PLAYERINIT; // Reset player
 
                 // Free data before mp changes in order to avoid memory leaks and segmentation faults
+                /*
                 freeCollisionData(hits, NUM_RAYS);
                 freeCollisionData(enemyData, mp->enemyCount);
-                freeCollisionData(projectileData, MAXPROJECTILES);
+                freeCollisionData(projectileData, MAXPROJECTILES);*/
                 free(weapons);
                 EndDrawing();
 
@@ -198,8 +197,8 @@ int main(void)
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
                 currentwpn = 0;
 
-                continue; // Only one should be needed
-                break;    // Extra just in case
+                // continue; // Only one should be needed
+                break; // Extra just in case
             }
 
             break;
