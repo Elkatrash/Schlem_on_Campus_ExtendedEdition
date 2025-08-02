@@ -117,11 +117,8 @@ int main(void)
             for (int i = 0; i < ENEMY_UPDATES_PER_FRAME; i++)
                 updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls);
 
-            drawWeapon(weapons, currentwpn);
             for (int i = 0; i < PROJECTILE_UPDATES_PER_FRAME; i++)
                 updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
-
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
             break;
 
@@ -138,10 +135,6 @@ int main(void)
                 player.dir = (Vec2){0.0, 1.0};
                 gameState = MAINMENU;
             }
-
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
             break;
 
@@ -180,10 +173,6 @@ int main(void)
                 break;    // Extra just in case
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
-
             break;
 
         case DEATHSCREEN:
@@ -213,10 +202,6 @@ int main(void)
                 break;    // Extra just in case
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
-
             break;
 
         case THEEND:
@@ -229,14 +214,16 @@ int main(void)
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
-
             break;
         default:
             break;
         }
+        if (gameState != MAINMENU)
+        {
+            drawWeapon(weapons, currentwpn);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+        }
+
         // Always clean memory
         freeCollisionData(hits, NUM_RAYS);
         freeCollisionData(enemyData, mp->enemyCount);
