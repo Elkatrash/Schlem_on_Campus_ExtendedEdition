@@ -8,6 +8,16 @@
 #define FOV 90.0f
 #define FPS_TARGET 120
 
+typedef enum
+{
+    MAINMENU,
+    GAMEPLAY,
+    PAUSEMENU,
+    ENDSCREEN,
+    DEATHSCREEN,
+    THEEND
+} GameState;
+
 #define CERISE (Color){230, 65, 133, 255}
 
 extern Font jupiter;
@@ -18,5 +28,7 @@ void drawWeapon(void *wpns, int wpnid);
 void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies);
 
 void drawScene(void *player, void **enemyData, int enemycount, void **wallData, int raycount, void **projData, Image *floorImage, Texture2D *floorTextureBuffer, Image floorTexture, Image roofTexture);
+
+void drawMenu(GameState gameState);
 
 #endif

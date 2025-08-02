@@ -294,3 +294,59 @@ void drawScene(void *player, void **enemyData, int enemycount, void **wallData, 
     }
     free(allData); // Since we memcpy the only thing stored is pointers to the other pointers and thus the data itself will be freed later
 }
+
+void drawMenu(GameState gameState)
+{
+    const char *exit = "Exit game [ Backspace ]";
+    const char *ret = "Main Menu [ Esc ]";
+    switch (gameState)
+    {
+    case MAINMENU:
+        // Show main menu
+        const char *title = "Schlem on Campus";
+        const char *start = "Start Game [ Enter ]";
+        DrawTextEx(textFont, title, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, title, textFont.baseSize * 10, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 10, 10, BLACK);
+        DrawTextEx(textFont, start, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, start, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
+        break;
+    case GAMEPLAY:
+        break;
+    case PAUSEMENU:
+        // Show pause menu
+        const char *resume = "Resume [ Esc ]";
+        const char *main = "Main Menu [ Enter ]";
+        DrawTextEx(textFont, resume, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, resume, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, main, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, main, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        break;
+
+    case ENDSCREEN:
+        // Show end of level screen
+        const char *next = "Next level [ Enter ]";
+        DrawTextEx(textFont, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, next, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        break;
+    case DEATHSCREEN:
+        // Show death screen
+        const char *dead = "YOU DIED";
+        const char *retry = "Restart [ Enter ]";
+        DrawTextEx(textFont, dead, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, dead, textFont.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, textFont.baseSize * 8, 8, BLACK);
+        DrawTextEx(textFont, retry, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, retry, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15}, textFont.baseSize * 5, 5, BLACK);
+        break;
+    case THEEND:
+        // Show end screen
+        const char *won = "YOU'VE WON";
+        const char *congrts = "CONGRATULATIONS ON FINISHING THE GAME";
+        DrawTextEx(textFont, won, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, won, textFont.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, textFont.baseSize * 8, 8, CERISE);
+        DrawTextEx(textFont, congrts, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, congrts, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15}, textFont.baseSize * 5, 5, BLACK);
+        break;
+
+    default:
+        break;
+    }
+}

@@ -1,22 +1,10 @@
 #include "map.h"
-#include <math.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "enemy.h"
 #include "sprites.h"
 #include "screen.h"
-
-typedef enum
-{
-    MAINMENU,
-    GAMEPLAY,
-    PAUSEMENU,
-    ENDSCREEN,
-    DEATHSCREEN,
-    THEEND
-} GameState;
 
 int main(void)
 {
@@ -45,8 +33,6 @@ int main(void)
     int currentMap = 0;
     int currentwpn = 0;
     int remainingEnemies = 0;
-    const char *exit = "Exit game [ Backspace ]";
-    const char *ret = "Main Menu [ Esc ]";
 
     while (!WindowShouldClose())
     {
@@ -60,6 +46,8 @@ int main(void)
         CollisionData **projectileData = rayShotProjectile(player, FOV, mp, mp->projectiles); // Gets projectile CollisionData
 
         drawScene(&player, (void **)enemyData, mp->enemyCount, (void **)hits, NUM_RAYS, (void **)projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
+
+        drawMenu(gameState);
 
         // Switch between the different states
         switch (gameState)
@@ -78,12 +66,6 @@ int main(void)
             }
 
             rotate(&player.dir, ROTSPEED / 10);
-            // Show main menu
-            const char *title = "Schlem on Campus";
-            const char *start = "Start Game [ Enter ]";
-            DrawTextEx(textFont, title, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, title, textFont.baseSize * 10, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 10, 10, BLACK);
-            DrawTextEx(textFont, start, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, start, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
             break;
 
         case GAMEPLAY:
@@ -161,12 +143,6 @@ int main(void)
             drawWeapon(weapons, currentwpn);
             drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
-            // Show pause menu
-            const char *resume = "Resume [ Esc ]";
-            const char *main = "Main Menu [ Enter ]";
-            DrawTextEx(textFont, resume, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, resume, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, main, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, main, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
             break;
 
         case ENDSCREEN:
@@ -208,11 +184,6 @@ int main(void)
             drawWeapon(weapons, currentwpn);
             drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
-            // Show end of level screen
-            const char *next = "Next level [ Enter ]";
-            DrawTextEx(textFont, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, next, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
             break;
 
         case DEATHSCREEN:
@@ -246,13 +217,6 @@ int main(void)
             drawWeapon(weapons, currentwpn);
             drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
-            // Show death screen
-            const char *dead = "YOU DIED";
-            const char *retry = "Restart [ Enter ]";
-            DrawTextEx(textFont, dead, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, dead, textFont.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, textFont.baseSize * 8, 8, BLACK);
-            DrawTextEx(textFont, retry, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, retry, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15}, textFont.baseSize * 5, 5, BLACK);
             break;
 
         case THEEND:
@@ -269,13 +233,6 @@ int main(void)
             drawWeapon(weapons, currentwpn);
             drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
-            // Show end screen
-            const char *won = "YOU'VE WON";
-            const char *congrts = "CONGRATULATIONS ON FINISHING THE GAME";
-            DrawTextEx(textFont, won, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, won, textFont.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, textFont.baseSize * 8, 8, CERISE);
-            DrawTextEx(textFont, congrts, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, congrts, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, CERISE);
-            DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
-            DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15}, textFont.baseSize * 5, 5, BLACK);
             break;
         default:
             break;
