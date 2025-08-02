@@ -17,4 +17,6 @@ void drawWeapon(void *wpns, int wpnid);
 
 void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies);
 
+void drawScene(void *player, void **enemyData, int enemycount, void **wallData, int raycount, void **projData, Image *floorImage, Texture2D *floorTextureBuffer, Image floorTexture, Image roofTexture);
+
 #endif
