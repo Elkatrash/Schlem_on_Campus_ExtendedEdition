@@ -14,6 +14,7 @@
                 "src/movement.c",
                 "src/raycast.c",
                 "src/sprites.c",
+                "src/screen.c",
                 "-Iinclude",
                 "-Llib",
                 "-lraylib",

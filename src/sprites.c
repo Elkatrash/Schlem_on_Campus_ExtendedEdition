@@ -1,4 +1,8 @@
 #include "sprites.h"
+#include "screen.h"
+
+Font jupiter;
+Font textFont;
 
 Texture2D Sprites[NUM_OF_SPRITES] = {0};
 
@@ -8,6 +12,8 @@ int initSprites()
     {
         Sprites[i] = LoadTexture(SpritePaths[i]);
     }
+    jupiter = LoadFont("Data/Sprites/HUD/fonts/jupiter_crash.png");
+    textFont = LoadFont("Data/Sprites/Fonts/setback.png");
     return 1;
 }
 
@@ -17,6 +23,8 @@ void destroySprites()
     {
         UnloadTexture(Sprites[i]);
     }
+    UnloadFont(jupiter);
+    UnloadFont(textFont);
     return;
 }
 

@@ -1,318 +1,15 @@
-#include "raylib.h"
-#include "raycast.h"
-#include "movement.h"
 #include "map.h"
-#include <math.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "enemy.h"
 #include "sprites.h"
-
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
-#define MAP_WIDTH 10
-#define MAP_HEIGHT 10
-#define NUM_RAYS 1920
-#define FOV 90.0f
-
-typedef enum
-{
-    MAINMENU,
-    GAMEPLAY,
-    PAUSEMENU,
-    ENDSCREEN,
-    DEATHSCREEN,
-    THEEND
-} GameState;
-
-Color CERISE = {230, 65, 133, 255};
-
-int compareEnemyDistance(const void *a, const void *b)
-{
-    // Load in thwo collisiondata pointers
-    CollisionData *f1 = *(CollisionData **)a;
-    CollisionData *f2 = *(CollisionData **)b;
-    // Compare their distance
-    if (!f1 || !f2)
-        return -1;
-    float cmp = f1->d - f2->d;
-    if (cmp == 0.0)
-        return 0;
-    if (cmp < 0.0)
-        return 1;
-    return -1;
-}
-
-void drawScene(Player p1, CollisionData **enemyColl, int enemycount, CollisionData **wallhits, int raycount, CollisionData **projectileData, Image *floorImage, Texture2D *floorTextureBuffer, Image floorTexture, Image roofTexture)
-{
-
-    // Group all the collisiondata into one huge array
-    CollisionData **allData = malloc(sizeof(CollisionData *) * (enemycount + raycount + MAXPROJECTILES));
-    if (!allData)
-        return;
-    memcpy(allData, enemyColl, enemycount * sizeof(CollisionData *));
-    memcpy(allData + enemycount, wallhits, raycount * sizeof(CollisionData *));
-    memcpy(allData + enemycount + raycount, projectileData, MAXPROJECTILES * sizeof(CollisionData *));
-
-    // quicksort the array based on the distance of the collisions
-    qsort(allData, (enemycount + raycount + MAXPROJECTILES), sizeof(CollisionData *), compareEnemyDistance);
-
-    Color *pixels = floorImage->data; // Pointer to the Image pixel buffer
-
-    Vec2 plane = {
-        -p1.dir.y * tanf(DEG_TO_RAD(FOV / 2)),
-        p1.dir.x * tanf(DEG_TO_RAD(FOV / 2))};
-
-    float posScale = 0.0150f; // Achieved through trial and error. If the floor is moving to much in the same direction as the player. I.e moves infront of the player. This is to low and vice versa
-
-    for (int y = SCREEN_HEIGHT / 2 + 1; y < SCREEN_HEIGHT; y++)
-    {
-        float rayDirX0 = p1.dir.x - plane.x;
-        float rayDirY0 = p1.dir.y - plane.y;
-        float rayDirX1 = p1.dir.x + plane.x;
-        float rayDirY1 = p1.dir.y + plane.y;
-
-        float rowDistance = (float)SCREEN_HEIGHT / (2.0f * y - SCREEN_HEIGHT);
-        float stepX = rowDistance * (rayDirX1 - rayDirX0) / SCREEN_WIDTH;
-        float stepY = rowDistance * (rayDirY1 - rayDirY0) / SCREEN_WIDTH;
-
-        float floorX = p1.pos.x * posScale + rowDistance * rayDirX0;
-        float floorY = p1.pos.y * posScale + rowDistance * rayDirY0;
-
-        for (int x = 0; x < SCREEN_WIDTH; ++x)
-        {
-
-            float repeatScale = 1.0f; // how much world space each texture tile covers
-
-            int tx = (int)((floorX / repeatScale) * floorTexture.width) % floorTexture.width;
-            int ty = (int)((floorY / repeatScale) * floorTexture.height) % floorTexture.height;
-
-            // Ensure wrapping is safe for negative values
-            tx = (tx + floorTexture.width) % floorTexture.width;
-            ty = (ty + floorTexture.height) % floorTexture.height;
-
-            int ceilingY = SCREEN_HEIGHT - y;
-
-            // Get the floor and ceiling colors
-            Color floorColor = GetImageColor(floorTexture, tx, ty);
-            Color ceilingColor = GetImageColor(roofTexture, tx, ty);
-
-            // Set the pixels in the Image data directly (faster than DrawPixel)
-            pixels[y * SCREEN_WIDTH + x] = floorColor;
-            pixels[ceilingY * SCREEN_WIDTH + x] = ceilingColor;
-
-            floorX += stepX;
-            floorY += stepY;
-        }
-    }
-
-    // After updating the floorImage, update the floorTextureBuffer
-    UpdateTexture(*floorTextureBuffer, floorImage->data);
-
-    // Draw the modified floorImage (both floor and ceiling) to the screen
-    DrawTexture(*floorTextureBuffer, 0, 0, WHITE); // You can adjust the position here
-
-    for (int c = 0; c < (enemycount + raycount + MAXPROJECTILES); c++)
-    {
-        if (!allData[c]) // skip null data
-            continue;
-
-        switch (isnan(allData[c]->textureOffset)) // Collisions with non wall objects have textureOffset as Nan
-        {
-        case 1: // Not a wall
-        {
-            Vec2 enemyPos = allData[c]->position;
-
-            // Vector from player to enemy
-            float dx = enemyPos.x - p1.pos.x;
-            float dy = enemyPos.y - p1.pos.y;
-
-            // Inverse camera transform
-            float invDet = 1.0f / (plane.x * p1.dir.y - p1.dir.x * plane.y);
-
-            float transformX = invDet * (p1.dir.y * dx - p1.dir.x * dy);
-            float transformY = invDet * (-plane.y * dx + plane.x * dy);
-
-            if (transformY <= 0)
-                continue; // Enemy is behind the player
-
-            // Projected X position on screen
-            float enemyScreenX = (SCREEN_WIDTH / 2) * (1 + transformX / transformY);
-
-            Texture2D sprite = allData[c]->texture;
-
-            // Preserve sprite aspect ratio
-            float aspectRatio = (float)sprite.width / (float)sprite.height;
-
-            float dist = allData[c]->d;
-            float corrected = dist * allData[c]->angle;                 // Correct fisheye effect
-            float wallHeight = (TILE_SIZE * SCREEN_HEIGHT) / corrected; // Wall height based on screen size
-
-            // Sprite height scaling factor
-            float spritesScale = 24.0;
-            float spriteHeight = spritesScale * (SCREEN_HEIGHT / transformY) * 1.8f * ((float)sprite.height / 64.0); // 1.8 = tune to taste
-            float spriteWidth = spriteHeight * aspectRatio;
-
-            Rectangle src = {
-                0, 0,
-                (float)sprite.width,
-                (float)sprite.height};
-
-            Rectangle dest = {
-                enemyScreenX - spriteWidth / 2,
-                SCREEN_HEIGHT / 2 + wallHeight / 2 - spriteHeight,
-                spriteWidth,
-                spriteHeight};
-
-            DrawTexturePro(sprite, src, dest, (Vector2){0, 0}, 0.0f, WHITE);
-            break;
-        }
-        default: // A wall
-        {
-
-            float dist = allData[c]->d;
-            float corrected = dist * vectorDot(allData[c]->rayDir, p1.dir); // Correct fisheye effect
-            float wallHeight = ((TILE_SIZE * SCREEN_HEIGHT) / corrected);   // Wall height based on screen size
-
-            Texture2D texture = allData[c]->texture;
-
-            float sliceWidth = (float)SCREEN_WIDTH / NUM_RAYS;
-            float screenX = allData[c]->id * sliceWidth;
-
-            // --- Draw walls ---
-            float texX = allData[c]->textureOffset * texture.width;
-            // Source rectangle: a vertical slice of the wall texture
-            Rectangle source = {
-                texX,
-                0,
-                1,
-                (float)texture.height};
-
-            // Destination rectangle: the scaled vertical slice on screen
-            Rectangle destination = {
-                screenX, // X on screen
-                (SCREEN_HEIGHT / 2.0f) - (wallHeight / 2.0f),
-                sliceWidth, // stretches pixels in source retangel to slicewith
-                wallHeight};
-
-            DrawTexturePro(texture, source, destination, (Vector2){0, 0}, 0.0f, WHITE);
-        }
-
-        break;
-        }
-    }
-    free(allData); // Since we memcpy the only thing stored is pointers to the other pointers and thus the data itself will be freed later
-}
-
-void drawWeapon(Weapon *wpns, int wpnid)
-{
-    switch (wpns[wpnid].currentCooldown > (wpns[wpnid].baseCooldown / 2)) // draws Different sprite depending on cooldown
-    {
-    case 0:
-    {
-        Rectangle src = {
-            0, 0,
-            (float)wpns[wpnid].normalSprite.width,
-            (float)wpns[wpnid].normalSprite.height};
-
-        Rectangle dest = {
-            wpns[wpnid].screenPos.x,
-            SCREEN_HEIGHT - (wpns[wpnid].normalSprite.height * wpns[wpnid].normalScale.y) + wpns[wpnid].screenPos.y,
-            wpns[wpnid].normalSprite.width * wpns[wpnid].normalScale.x,
-            wpns[wpnid].normalSprite.height * wpns[wpnid].normalScale.y};
-
-        DrawTexturePro(wpns[wpnid].normalSprite, src, dest, (Vector2){0, 0}, 0.0f, WHITE);
-        break;
-    }
-    default:
-    {
-        Rectangle src = {
-            0, 0,
-            (float)wpns[wpnid].shootingSprite.width,
-            (float)wpns[wpnid].shootingSprite.height};
-
-        Rectangle dest = {
-            wpns[wpnid].screenPos.x,
-            SCREEN_HEIGHT - (wpns[wpnid].shootingSprite.height * wpns[wpnid].shootingScale.y) + wpns[wpnid].screenPos.y,
-            wpns[wpnid].shootingSprite.width * wpns[wpnid].shootingScale.x,
-            wpns[wpnid].shootingSprite.height * wpns[wpnid].shootingScale.y};
-
-        DrawTexturePro(wpns[wpnid].shootingSprite, src, dest, (Vector2){0, 0}, 0.0f, WHITE);
-        break;
-    }
-    }
-}
-
-Font jupiter;
-
-void drawHud(Player player, Weapon wpn, int wpnn, int remaingingEnemies)
-{
-
-    float hudHeightScale = 0.8f * (float)SCREEN_HEIGHT / 1080.0; // An attempt to make the hud scale to different aspect ratios. For your own sanity, don't
-
-    // Draw the hud background
-    DrawRectangle(0, (SCREEN_HEIGHT - 90 * hudHeightScale) - 4, SCREEN_WIDTH, 90 * hudHeightScale, WHITE);
-    DrawRectangle(0, SCREEN_HEIGHT - 90 * hudHeightScale, SCREEN_WIDTH, 90 * hudHeightScale, CERISE);
-
-    // Draw konglig doomguy
-    Rectangle src = {
-        0, 0, Sprites[UI_GUY].width, Sprites[UI_GUY].height};
-    Rectangle dest = {
-        (SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2,
-        SCREEN_HEIGHT - hudHeightScale * Sprites[UI_GUY].height,
-        Sprites[UI_GUY].width * hudHeightScale,
-        Sprites[UI_GUY].height * hudHeightScale};
-    DrawTexturePro(Sprites[UI_GUY], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-
-    // Make an offset to the right of konglig doomguy
-    src = (Rectangle){0, 0, Sprites[UI_SELECT1].width, Sprites[UI_SELECT1].height};
-    dest = (Rectangle){(SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2, SCREEN_HEIGHT - hudHeightScale * Sprites[UI_GUY].height, Sprites[UI_SELECT1].width, Sprites[UI_SELECT1].height};
-
-    // Draw the corresponding weapon select sprite
-    switch (wpnn)
-    {
-    case 0:
-        DrawTexturePro(Sprites[UI_SELECT1], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-        break;
-    case 1:
-        DrawTexturePro(Sprites[UI_SELECT2], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-        break;
-    case 2:
-        DrawTexturePro(Sprites[UI_SELECT3], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-        break;
-    default:
-        break;
-    }
-    // make three black squares
-    DrawRectangle(((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 300, 90 * hudHeightScale - 8, BLACK);
-    DrawRectangle(((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 204, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 200, 90 * hudHeightScale - 8, BLACK);
-    DrawRectangle(4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 450, 90 * hudHeightScale - 8, BLACK);
-
-    // Draw some text in the squares
-    char buffer[64];
-    sprintf(buffer, "HP: %d", player.hp);
-    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 200, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
-
-    sprintf(buffer, "+");
-    DrawText(buffer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 20, (Color){245, 40, 145, 204});
-
-    if (wpnn == 0)
-        sprintf(buffer, "AMMO: inf");
-    else
-        sprintf(buffer, "AMMO: %d", wpn.ammo);
-
-    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
-
-    sprintf(buffer, "REMAINING 0an: %d", remaingingEnemies);
-    DrawTextEx(jupiter, buffer, (Vector2){8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
-}
+#include "screen.h"
 
 int main(void)
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Schlem on Campus");
-    SetTargetFPS(120);
+    SetTargetFPS(FPS_TARGET);
     srand(time(NULL));
     SetExitKey(KEY_BACKSPACE); // set close program key, so esc can be used for pause
     ToggleFullscreen();
@@ -326,9 +23,6 @@ int main(void)
     // Load assets
     Map *mp = loadMap(Maps[0]);
 
-    Font font = LoadFont("Data/Sprites/Fonts/setback.png");
-
-    jupiter = LoadFont("Data/Sprites/HUD/fonts/jupiter_crash.png");
     Image floorImage = GenImageColor(SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     Texture2D floorTextureBuffer = LoadTextureFromImage(floorImage);
     Image floorTexture = LoadImageFromTexture(Sprites[MAP_FLOOR]);
@@ -339,8 +33,6 @@ int main(void)
     int currentMap = 0;
     int currentwpn = 0;
     int remainingEnemies = 0;
-    const char *exit = "Exit game [ Backspace ]";
-    const char *ret = "Main Menu [ Esc ]";
 
     while (!WindowShouldClose())
     {
@@ -353,7 +45,9 @@ int main(void)
 
         CollisionData **projectileData = rayShotProjectile(player, FOV, mp, mp->projectiles); // Gets projectile CollisionData
 
-        drawScene(player, enemyData, mp->enemyCount, hits, NUM_RAYS, projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
+        drawScene(&player, (void **)enemyData, mp->enemyCount, (void **)hits, NUM_RAYS, (void **)projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
+
+        drawMenu(gameState);
 
         // Switch between the different states
         switch (gameState)
@@ -372,12 +66,6 @@ int main(void)
             }
 
             rotate(&player.dir, ROTSPEED / 10);
-            // Show main menu
-            const char *title = "Schlem on Campus";
-            const char *start = "Start Game [ Enter ]";
-            DrawTextEx(font, title, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, title, font.baseSize * 10, 5).x / 2, SCREEN_HEIGHT / 6}, font.baseSize * 10, 10, BLACK);
-            DrawTextEx(font, start, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, start, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, exit, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2 + font.baseSize * 5}, font.baseSize * 5, 5, BLACK);
             break;
 
         case GAMEPLAY:
@@ -429,11 +117,8 @@ int main(void)
             for (int i = 0; i < ENEMY_UPDATES_PER_FRAME; i++)
                 updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls);
 
-            drawWeapon(weapons, currentwpn);
             for (int i = 0; i < PROJECTILE_UPDATES_PER_FRAME; i++)
                 updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
-
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
 
             break;
 
@@ -451,15 +136,6 @@ int main(void)
                 gameState = MAINMENU;
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
-            // Show pause menu
-            const char *resume = "Resume [ Esc ]";
-            const char *main = "Main Menu [ Enter ]";
-            DrawTextEx(font, resume, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, resume, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, main, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, main, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 5}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, exit, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 10}, font.baseSize * 5, 5, BLACK);
             break;
 
         case ENDSCREEN:
@@ -482,46 +158,26 @@ int main(void)
                 player.pos = STARTPOS;
                 player.dir = (Vec2){0.0, 1.0};
 
-                // Free data before mp changes in order to avoid memory leaks and segmentation faults
-                freeCollisionData(hits, NUM_RAYS);
-                freeCollisionData(enemyData, mp->enemyCount);
-                freeCollisionData(projectileData, MAXPROJECTILES);
-                EndDrawing();
 
                 freeMap(mp);                    // Unload old map
                 mp = loadMap(Maps[currentMap]); // load next Map
                 weapons[2].projectiles = mp->projectiles;
                 currentwpn = 0;
 
-                continue; // Only one should be needed
-                break;    // Extra just in case
+
+                break; // Extra just in case
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
-            // Show end of level screen
-            const char *next = "Next level [ Enter ]";
-            DrawTextEx(font, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, next, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, ret, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 5}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, exit, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 10}, font.baseSize * 5, 5, BLACK);
             break;
 
         case DEATHSCREEN:
-            if (IsKeyPressed(KEY_ESCAPE))
-            {
-                gameState = MAINMENU;
-            }
-            if (IsKeyPressed(KEY_ENTER))
+            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE))
             {
                 currentMap = 0; // Advance to next map
-                gameState = GAMEPLAY;
+
+                gameState = (IsKeyPressed(KEY_ESCAPE)) ? MAINMENU : GAMEPLAY;
                 player = PLAYERINIT; // Reset player
 
-                // Free data before mp changes in order to avoid memory leaks and segmentation faults
-                freeCollisionData(hits, NUM_RAYS);
-                freeCollisionData(enemyData, mp->enemyCount);
-                freeCollisionData(projectileData, MAXPROJECTILES);
                 free(weapons);
                 EndDrawing();
 
@@ -530,20 +186,9 @@ int main(void)
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
                 currentwpn = 0;
 
-                continue; // Only one should be needed
-                break;    // Extra just in case
+                break; // Extra just in case
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
-            // Show death screen
-            const char *dead = "YOU DIED";
-            const char *retry = "Restart [ Enter ]";
-            DrawTextEx(font, dead, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, dead, font.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, font.baseSize * 8, 8, BLACK);
-            DrawTextEx(font, retry, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, retry, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 5}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, ret, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 10}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, exit, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 15}, font.baseSize * 5, 5, BLACK);
             break;
 
         case THEEND:
@@ -556,20 +201,16 @@ int main(void)
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
             }
 
-            // Draw level in background
-            drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
-            // Show end screen
-            const char *won = "YOU'VE WON";
-            const char *congrts = "CONGRATULATIONS ON FINISHING THE GAME";
-            DrawTextEx(font, won, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, won, font.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, font.baseSize * 8, 8, CERISE);
-            DrawTextEx(font, congrts, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, congrts, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 5}, font.baseSize * 5, 5, CERISE);
-            DrawTextEx(font, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, ret, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 10}, font.baseSize * 5, 5, BLACK);
-            DrawTextEx(font, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(font, exit, font.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + font.baseSize * 15}, font.baseSize * 5, 5, BLACK);
             break;
         default:
             break;
         }
+        if (gameState != MAINMENU)
+        {
+            drawWeapon(weapons, currentwpn);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+        }
+
         // Always clean memory
         freeCollisionData(hits, NUM_RAYS);
         freeCollisionData(enemyData, mp->enemyCount);
