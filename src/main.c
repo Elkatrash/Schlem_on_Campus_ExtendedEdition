@@ -158,19 +158,13 @@ int main(void)
                 player.pos = STARTPOS;
                 player.dir = (Vec2){0.0, 1.0};
 
-                // Free data before mp changes in order to avoid memory leaks and segmentation faults
-                /*
-                freeCollisionData(hits, NUM_RAYS);
-                freeCollisionData(enemyData, mp->enemyCount);
-                freeCollisionData(projectileData, MAXPROJECTILES);
-                EndDrawing();*/
 
                 freeMap(mp);                    // Unload old map
                 mp = loadMap(Maps[currentMap]); // load next Map
                 weapons[2].projectiles = mp->projectiles;
                 currentwpn = 0;
 
-                // continue; // Only one should be needed
+
                 break; // Extra just in case
             }
 
@@ -184,11 +178,6 @@ int main(void)
                 gameState = (IsKeyPressed(KEY_ESCAPE)) ? MAINMENU : GAMEPLAY;
                 player = PLAYERINIT; // Reset player
 
-                // Free data before mp changes in order to avoid memory leaks and segmentation faults
-                /*
-                freeCollisionData(hits, NUM_RAYS);
-                freeCollisionData(enemyData, mp->enemyCount);
-                freeCollisionData(projectileData, MAXPROJECTILES);*/
                 free(weapons);
                 EndDrawing();
 
@@ -197,7 +186,6 @@ int main(void)
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
                 currentwpn = 0;
 
-                // continue; // Only one should be needed
                 break; // Extra just in case
             }
 
