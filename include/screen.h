@@ -8,9 +8,13 @@
 #define FOV 90.0f
 #define FPS_TARGET 120
 
+#define CERISE (Color){230, 65, 133, 255}
+
 extern Font jupiter;
 extern Font textFont;
 
 void drawWeapon(void *wpns, int wpnid);
+
+void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies);
 
 #endif

@@ -18,8 +18,6 @@ typedef enum
     THEEND
 } GameState;
 
-Color CERISE = {230, 65, 133, 255};
-
 int compareEnemyDistance(const void *a, const void *b)
 {
     // Load in thwo collisiondata pointers
@@ -197,68 +195,6 @@ void drawScene(Player p1, CollisionData **enemyColl, int enemycount, CollisionDa
     free(allData); // Since we memcpy the only thing stored is pointers to the other pointers and thus the data itself will be freed later
 }
 
-void drawHud(Player player, Weapon wpn, int wpnn, int remaingingEnemies)
-{
-
-    float hudHeightScale = 0.8f * (float)SCREEN_HEIGHT / 1080.0; // An attempt to make the hud scale to different aspect ratios. For your own sanity, don't
-
-    // Draw the hud background
-    DrawRectangle(0, (SCREEN_HEIGHT - 90 * hudHeightScale) - 4, SCREEN_WIDTH, 90 * hudHeightScale, WHITE);
-    DrawRectangle(0, SCREEN_HEIGHT - 90 * hudHeightScale, SCREEN_WIDTH, 90 * hudHeightScale, CERISE);
-
-    // Draw konglig doomguy
-    Rectangle src = {
-        0, 0, Sprites[UI_GUY].width, Sprites[UI_GUY].height};
-    Rectangle dest = {
-        (SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2,
-        SCREEN_HEIGHT - hudHeightScale * Sprites[UI_GUY].height,
-        Sprites[UI_GUY].width * hudHeightScale,
-        Sprites[UI_GUY].height * hudHeightScale};
-    DrawTexturePro(Sprites[UI_GUY], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-
-    // Make an offset to the right of konglig doomguy
-    src = (Rectangle){0, 0, Sprites[UI_SELECT1].width, Sprites[UI_SELECT1].height};
-    dest = (Rectangle){(SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2, SCREEN_HEIGHT - hudHeightScale * Sprites[UI_GUY].height, Sprites[UI_SELECT1].width, Sprites[UI_SELECT1].height};
-
-    // Draw the corresponding weapon select sprite
-    switch (wpnn)
-    {
-    case 0:
-        DrawTexturePro(Sprites[UI_SELECT1], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-        break;
-    case 1:
-        DrawTexturePro(Sprites[UI_SELECT2], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-        break;
-    case 2:
-        DrawTexturePro(Sprites[UI_SELECT3], src, dest, (Vector2){0.0, 0.0}, 0.0f, WHITE);
-        break;
-    default:
-        break;
-    }
-    // make three black squares
-    DrawRectangle(((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 300, 90 * hudHeightScale - 8, BLACK);
-    DrawRectangle(((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 204, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 200, 90 * hudHeightScale - 8, BLACK);
-    DrawRectangle(4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 450, 90 * hudHeightScale - 8, BLACK);
-
-    // Draw some text in the squares
-    char buffer[64];
-    sprintf(buffer, "HP: %d", player.hp);
-    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 200, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
-
-    sprintf(buffer, "+");
-    DrawText(buffer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 20, (Color){245, 40, 145, 204});
-
-    if (wpnn == 0)
-        sprintf(buffer, "AMMO: inf");
-    else
-        sprintf(buffer, "AMMO: %d", wpn.ammo);
-
-    DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
-
-    sprintf(buffer, "REMAINING 0an: %d", remaingingEnemies);
-    DrawTextEx(jupiter, buffer, (Vector2){8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
-}
-
 int main(void)
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Schlem on Campus");
@@ -380,7 +316,7 @@ int main(void)
             for (int i = 0; i < PROJECTILE_UPDATES_PER_FRAME; i++)
                 updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
 
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
 
             break;
 
@@ -400,7 +336,8 @@ int main(void)
 
             // Draw level in background
             drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+
             // Show pause menu
             const char *resume = "Resume [ Esc ]";
             const char *main = "Main Menu [ Enter ]";
@@ -446,7 +383,8 @@ int main(void)
 
             // Draw level in background
             drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+
             // Show end of level screen
             const char *next = "Next level [ Enter ]";
             DrawTextEx(textFont, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, next, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
@@ -483,7 +421,8 @@ int main(void)
 
             // Draw level in background
             drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+
             // Show death screen
             const char *dead = "YOU DIED";
             const char *retry = "Restart [ Enter ]";
@@ -505,7 +444,8 @@ int main(void)
 
             // Draw level in background
             drawWeapon(weapons, currentwpn);
-            drawHud(player, weapons[currentwpn], currentwpn, remainingEnemies);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+
             // Show end screen
             const char *won = "YOU'VE WON";
             const char *congrts = "CONGRATULATIONS ON FINISHING THE GAME";
