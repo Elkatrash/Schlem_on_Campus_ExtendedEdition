@@ -12,8 +12,6 @@
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-#define MAP_WIDTH 10
-#define MAP_HEIGHT 10
 #define NUM_RAYS 1920
 #define FOV 90.0f
 
