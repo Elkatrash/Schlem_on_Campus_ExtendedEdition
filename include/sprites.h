@@ -6,7 +6,7 @@ int initSprites();
 
 void destroySprites();
 
-#define NUM_OF_SPRITES 17
+#define NUM_OF_SPRITES 20
 
 typedef enum SpriteNames
 {
@@ -17,8 +17,11 @@ typedef enum SpriteNames
     MAP_CEILING,
 
     ENEMY_MELEE,
+    ENEMY_MELLE_DEAD,
     ENEMY_MIDRANGE,
+    ENEMY_MIDRANGE_DEAD,
     ENEMY_SNIPER,
+    ENEMY_SNIPER_DEAD,
     ENEMY_PROJECTILE,
     ENEMY_DEAD,
 

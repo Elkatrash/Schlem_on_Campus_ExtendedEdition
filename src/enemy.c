@@ -162,7 +162,7 @@ void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int 
             foe->visibility = INVISIBLE; // Health packs and ammo are invisible when dead
             return;
         }
-        foe->sprite = ENEMY_DEAD; // Nollan becomes nollekort.
+        foe->sprite++; // Nollan becomes nollekort.
         return;
     }
 

@@ -36,8 +36,11 @@ const char *SpritePaths[] = {
     "Data/Sprites/Sky.png",
 
     "Data/Sprites/MeleeNollantransp.png",
+    "Data/Sprites/MeleeDead.png",
     "Data/Sprites/MidrangeNollantransp.png",
+    "Data/Sprites/MidrangeDead.png",
     "Data/Sprites/LongRangeNollan.png",
+    "Data/Sprites/LongRangeDead.png",
     "Data/Sprites/Projectiles/EvilProjectile.png",
     "Data/Sprites/Nollekorttransp.png",
 
