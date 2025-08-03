@@ -225,6 +225,7 @@ int main(void)
     UnloadImage(floorTexture);
 
     freeMap(mp);
+    destroySprites();
 
     CloseWindow();
 

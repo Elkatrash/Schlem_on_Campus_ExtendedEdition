@@ -6,7 +6,7 @@ int initSprites();
 
 void destroySprites();
 
-#define NUM_OF_SPRITES 20
+#define NUM_OF_SPRITES 26
 
 typedef enum SpriteNames
 {
@@ -33,6 +33,13 @@ typedef enum SpriteNames
     UI_SELECT2,
     UI_SELECT3,
     UI_GUY,
+
+    WEAPON_FIST_IDLE,
+    WEAPON_FIST_PUNCH,
+    WEAPON_KPIST_IDLE,
+    WEAPON_KPIST_SHOOT,
+    WEAPON_PIE_IDLE,
+    WEAPON_PIE_SHOOT,
 
 } SpriteNames;
 

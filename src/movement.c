@@ -372,8 +372,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
         return NULL;
 
     // Make the fist weapon
-    wps[0].normalSprite = LoadTexture("Data/Sprites/Weapons/Fist1transp.png");
-    wps[0].shootingSprite = LoadTexture("Data/Sprites/Weapons/Fist2transp.png");
+    wps[0].normalSprite = Sprites[WEAPON_FIST_IDLE];
+    wps[0].shootingSprite = Sprites[WEAPON_FIST_PUNCH];
     wps[0].baseCooldown = 15;
     wps[0].currentCooldown = 0;
     wps[0].screenPos = (Vec2){width * 0.5, 0};
@@ -386,8 +386,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[0].dmg = 30;
 
     // Make the smg
-    wps[1].normalSprite = LoadTexture("Data/Sprites/Weapons/kpisttransp.png");
-    wps[1].shootingSprite = LoadTexture("Data/Sprites/Weapons/kpist2transp.png");
+    wps[1].normalSprite = Sprites[WEAPON_KPIST_IDLE];
+    wps[1].shootingSprite = Sprites[WEAPON_KPIST_SHOOT];
     wps[1].baseCooldown = 15;
     wps[1].currentCooldown = 0;
     wps[1].screenPos = (Vec2){width / 5.0, 0};
@@ -400,8 +400,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[1].dmg = 20;
 
     // Make the pie
-    wps[2].normalSprite = LoadTexture("Data/Sprites/Weapons/Projectile1transp.png");
-    wps[2].shootingSprite = LoadTexture("Data/Sprites/Weapons/Fist2transp.png");
+    wps[2].normalSprite = Sprites[WEAPON_PIE_IDLE];
+    wps[2].shootingSprite = Sprites[WEAPON_PIE_SHOOT];
     wps[2].baseCooldown = 15;
     wps[2].currentCooldown = 0;
     wps[2].screenPos = (Vec2){width * 0.5, 0};
