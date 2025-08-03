@@ -4,6 +4,7 @@
 #include "enemy.h"
 #include "map.h"
 #include "sprites.h"
+#include "screen.h"
 
 void wishMoveForward(Player *player)
 {
@@ -142,7 +143,7 @@ void executeMovement(Player *player, Wall *walls, int wallcount)
     {
         normalize(&wish_dir);
     }
-    float accel_speed = MAXSPEED * 0.1 / 60;
+    float accel_speed = MAXSPEED * 0.1 / FPS_TARGET;
     vectorScale(wish_dir, accel_speed, &wish_dir);
     vectorAdd(old_vel, wish_dir, &new_vel);
     vectorScale(new_vel, 0.9, &new_vel);
@@ -335,8 +336,8 @@ int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec)
     default:
         break;
     }
-    moveEnemy(projectile, projectile->dir, 60, NULL, 0); // Move the projectile
-    vectorSub(projectile->pos, player->pos, &diffvec);   // Check if the projectile is too far away from the player
+    moveEnemy(projectile, projectile->dir, FPS_TARGET, NULL, 0); // Move the projectile
+    vectorSub(projectile->pos, player->pos, &diffvec);           // Check if the projectile is too far away from the player
     if (vectorLenght(diffvec) >= 2000)
     {
         return 1; // Signal to updateProjectiles that it should free and NULL it
@@ -344,8 +345,12 @@ int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec)
     return 0;
 }
 
-void updateProjectiles(Enemy **projectiles, Player *player, Enemy *enemies, int ec, Weapon *wpn, int *ppointer)
+void updateProjectiles(Player *player, Weapon *wpn, Map *mp)
 {
+    Enemy **projectiles = mp->projectiles;
+    int *ppointer = &mp->ppointer;
+    Enemy *enemies = mp->enemies;
+    int ec = mp->enemyCount;
 
     if (projectiles[*ppointer]) // if the current queue slot contains anything
     {

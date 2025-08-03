@@ -122,8 +122,7 @@ Map *loadMap(const char *filename)
         result->enemies[i].id = id;
         result->enemies[i].pos = (Vec2){x, y};
         result->enemies[i].hitRadius = (Sprites[result->enemies[i].sprite].width * 16) / 64;
-        result->enemies[i].baseCoolDown /= (nenemy);
-        result->enemies[i].baseCoolDown *= ((float)ENEMY_UPDATES_PER_FRAME);
+        result->enemies[i].baseCoolDown *= ((float)nenemy / (float)ENEMY_UPDATES_PER_FRAME);
         result->enemies[i].acceleration *= ((float)nenemy / (float)ENEMY_UPDATES_PER_FRAME);
         result->enemies[i].maxSpeed *= ((float)nenemy / (float)ENEMY_UPDATES_PER_FRAME);
     }
