@@ -110,7 +110,7 @@ void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies)
 
     DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
 
-    sprintf(buffer, "REMAINING 0an: %d", remaingingEnemies);
+    sprintf(buffer, "REMAINING Oan: %d", remaingingEnemies);
     DrawTextEx(jupiter, buffer, (Vector2){8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
 }
 

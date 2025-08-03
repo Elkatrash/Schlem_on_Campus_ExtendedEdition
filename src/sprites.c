@@ -41,7 +41,7 @@ const char *SpritePaths[] = {
     "Data/Sprites/Enemies/MidrangeDead.png",
     "Data/Sprites/Enemies/LongRangeNollan.png",
     "Data/Sprites/Enemies/LongRangeDead.png",
-    "Data/Sprites/Enemies/Projectiles/EvilProjectile.png",
+    "Data/Sprites/Projectiles/EvilProjectile.png",
     "Data/Sprites/Enemies/Nollekorttransp.png",
 
     "Data/Sprites/Health.png",

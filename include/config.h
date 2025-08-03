@@ -13,10 +13,11 @@
 #define MAXHP 100
 // player speed
 #define MAXSPEED 800
-#define MAXPROJECTILES 30
+#define MAXPROJECTILES 50
 #define PROJECTILE_UPDATES_PER_FRAME 10
 // How fast character rotates
 #define ROTSPEED PI / 80
+#define PITYHITRADIUS 3.0
 
 #define ENEMY_UPDATES_PER_FRAME 60
 

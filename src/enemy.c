@@ -282,7 +282,7 @@ const Enemy EnemyPresets[] = {
         70,                // hp
         3,                 // dmg
         0,                 // id
-        1800,              // baseCooldown
+        10,                // baseCooldown
         0,                 // cooldown
         900,               // acceleration
         3000,              // maxSpeed
@@ -301,7 +301,7 @@ const Enemy EnemyPresets[] = {
         100,               // hp
         20,                // dmg
         0,                 // id
-        14400,             // baseCooldown
+        55,                // baseCooldown
         0,                 // cooldown
         400,               // acceleration
         1500,              // maxSpeed
@@ -320,7 +320,7 @@ const Enemy EnemyPresets[] = {
         50,                // hp
         35,                // dmg
         0,                 // id
-        18000,             // baseCooldown
+        75,                // baseCooldown
         0,                 // cooldown
         500,               // acceleration
         1200,              // maxSpeed

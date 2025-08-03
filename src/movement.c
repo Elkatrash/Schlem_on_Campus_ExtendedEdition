@@ -230,7 +230,7 @@ void shootEnemy(Player *player, Enemy *enemy, Wall *walls, int wallcount, int dm
     }
     if (nbwall == wallcount) // if there isn't a wall in the way
     {
-        if (lenFromPointToLine(enemy->pos, vecsToLine(player->pos, player_look)) < enemy->hitRadius) // if the player is pointing to the enemy sprite (With some slight tolerance)
+        if (lenFromPointToLine(enemy->pos, vecsToLine(player->pos, player_look)) < (enemy->hitRadius + PITYHITRADIUS)) // if the player is pointing to the enemy sprite (With some slight tolerance)
         {
             enemy->hp -= dmg; // damage enemy
         }
@@ -285,7 +285,7 @@ void attackEnemy(Weapon *wpn, Player *player, Map *mp)
             Vec2 diffvec;
             vectorSub(mp->enemies[i].pos, player->pos, &diffvec);
             float ds = vectorLenght(diffvec);
-            if ((ds - 30.0) < mp->enemies[i].hitRadius)
+            if ((ds - 33.0) < mp->enemies[i].hitRadius)
                 shootEnemy(player, mp->enemies + i, mp->walls, mp->numOfWalls, wpn->dmg);
         }
         break;

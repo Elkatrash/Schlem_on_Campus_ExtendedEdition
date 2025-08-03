@@ -9,6 +9,7 @@
 #define PROJECTILE_UPDATES_PER_FRAME 10
 // How fast character rotates
 #define ROTSPEED PI / 80
+#define PITYHITRADIUS 3.0
 #endif
 
 #ifndef MIN

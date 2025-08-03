@@ -21,7 +21,7 @@ int main(void)
     GameState gameState = MAINMENU;
 
     // Load assets
-    Map *mp = loadMap(Maps[0]);
+    Map *mp = loadMap(Maps[2]);
 
     Image floorImage = GenImageColor(SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     Texture2D floorTextureBuffer = LoadTextureFromImage(floorImage);
@@ -30,7 +30,7 @@ int main(void)
 
     Weapon *weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
 
-    int currentMap = 0;
+    int currentMap = 2;
     int currentwpn = 0;
     int remainingEnemies = 0;
     int specialFlag = 0;
