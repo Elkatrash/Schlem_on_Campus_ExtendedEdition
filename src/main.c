@@ -21,7 +21,7 @@ int main(void)
     GameState gameState = MAINMENU;
 
     // Load assets
-    Map *mp = loadMap(Maps[2]);
+    Map *mp = loadMap(Maps[0]);
 
     Image floorImage = GenImageColor(SCREEN_WIDTH, SCREEN_HEIGHT, BLACK);
     Texture2D floorTextureBuffer = LoadTextureFromImage(floorImage);
@@ -30,7 +30,7 @@ int main(void)
 
     Weapon *weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
 
-    int currentMap = 2;
+    int currentMap = 0;
     int currentwpn = 0;
     int remainingEnemies = 0;
     int specialFlag = 0;
@@ -49,6 +49,12 @@ int main(void)
         drawScene(&player, (void **)enemyData, mp->enemyCount, (void **)hits, NUM_RAYS, (void **)projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
 
         drawMenu(gameState);
+
+        if (gameState != MAINMENU)
+        {
+            drawWeapon(weapons, currentwpn);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+        }
 
         // Switch between the different states
         switch (gameState)
@@ -203,11 +209,6 @@ int main(void)
             break;
         default:
             break;
-        }
-        if (gameState != MAINMENU)
-        {
-            drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
         }
 
         // Always clean memory
