@@ -282,10 +282,10 @@ const Enemy EnemyPresets[] = {
         70,                // hp
         3,                 // dmg
         0,                 // id
-        180,               // baseCooldown
+        1800,              // baseCooldown
         0,                 // cooldown
-        300,               // acceleration
-        1200,              // maxSpeed
+        900,               // acceleration
+        3000,              // maxSpeed
         -1,                // friendlyProjectile
         MELEE,             // type
     },
@@ -303,8 +303,8 @@ const Enemy EnemyPresets[] = {
         0,                 // id
         14400,             // baseCooldown
         0,                 // cooldown
-        100,               // acceleration
-        400,               // maxSpeed
+        400,               // acceleration
+        1500,              // maxSpeed
         -1,                // friendlyProjectile
         MIDRANGE,          // type
     },
@@ -322,8 +322,8 @@ const Enemy EnemyPresets[] = {
         0,                 // id
         18000,             // baseCooldown
         0,                 // cooldown
-        100,               // acceleration
-        400,               // maxSpeed
+        500,               // acceleration
+        1200,              // maxSpeed
         -1,                // friendlyProjectile
         SNIPER,            // type
     },
@@ -379,8 +379,8 @@ const Enemy EnemyPresets[] = {
         -1,                // id
         0,                 // baseCooldown
         0,                 // cooldown
-        2000,              // acceleration
-        4000,              // maxSpeed
+        4000,              // acceleration
+        8000,              // maxSpeed
         1,                 // friendlyProjectile
         F_PROJECTILE,      // type
     },
@@ -398,8 +398,8 @@ const Enemy EnemyPresets[] = {
         -1,                // id
         0,                 // baseCooldown
         0,                 // cooldown
-        2000,              // acceleration
-        4000,              // maxSpeed
+        4000,              // acceleration
+        7000,              // maxSpeed
         0,                 // friendlyProjectile
         E_PROJECTILE,      // type
     }
