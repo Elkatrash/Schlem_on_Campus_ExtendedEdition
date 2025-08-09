@@ -29,6 +29,18 @@ gcc src/*.c -o game \
 if [ $? -eq 0 ]; then
     echo "Compilation succeeded! Run your game with:"
     echo "LD_LIBRARY_PATH=lib/Lin64 ./game"
+    
+    # Prompt to launch the game
+    read -p "Launch the game now? (y/n) " answer
+    case "$answer" in
+        [Yy]* )
+            LD_LIBRARY_PATH=lib/Lin64 ./game
+            ;;
+        * )
+            echo "You can launch the game later with:"
+            echo "LD_LIBRARY_PATH=lib/Lin64 ./game"
+            ;;
+    esac
 else
     echo "Compilation failed."
 fi
