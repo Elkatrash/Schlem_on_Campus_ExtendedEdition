@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "map.h"
 #include "sprites.h"
+#include <limits.h>
 
 #define PLACEHOLDERRADIUS 1.0f
 
@@ -150,7 +151,7 @@ void moveEnemy(Enemy *foe, Vec2 dir, int targetFPS, Wall *walls, int wallcount)
     foe->pos = res;
 }
 
-void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int *pieAmmo, int targetFPS, float fov, Map *mp, int numOfEnemy, Wall *walls, int wallcount)
+void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int *pieAmmo, int targetFPS, float fov, Map *mp, Wall *walls, int wallcount)
 {
     if (foe->status == DEAD) // You're dead, skip your turn
         return;
@@ -162,7 +163,7 @@ void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int 
             foe->visibility = INVISIBLE; // Health packs and ammo are invisible when dead
             return;
         }
-        foe->sprite = ENEMY_DEAD; // Nollan becomes nollekort.
+        foe->sprite++; // Nollan becomes nollekort.
         return;
     }
 
@@ -205,7 +206,7 @@ void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int 
                     break;
                 }
 
-                foe->coolDown = foe->baseCoolDown / numOfEnemy;
+                foe->coolDown = foe->baseCoolDown;
             }
             else
             {
@@ -245,15 +246,15 @@ void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int 
     freeCollisionData(seePLayer, 1);
 }
 
-void updateEnemies(Enemy *Queue, int qSize, Player *p1, Weapon *k_pist, Weapon *pie, int targetFPS, float fov, Map *mp, Wall *walls, int wallcount)
+void updateEnemies(Player *p1, Weapon *k_pist, Weapon *pie, int targetFPS, float fov, Map *mp)
 {
     static int currentIndex = 0; // Index is saved between calls
 
-    if (qSize == 0) // if no enemies return
+    if (mp->enemyCount == 0) // if no enemies return
         return;
 
-    updateEnemy(Queue + currentIndex, *p1, &p1->hp, &k_pist->ammo, &pie->ammo, targetFPS, fov, mp, qSize, walls, wallcount); // update the enemy at index
-    currentIndex = (currentIndex + 1) % qSize;                                                                               // move index
+    updateEnemy(mp->enemies + currentIndex, *p1, &p1->hp, &k_pist->ammo, &pie->ammo, targetFPS, fov, mp, mp->walls, mp->numOfWalls); // update the enemy at index
+    currentIndex = (currentIndex + 1) % mp->enemyCount;                                                                              // move index
 }
 
 int countHostiles(Map *mp)
@@ -282,10 +283,10 @@ const Enemy EnemyPresets[] = {
         70,                // hp
         3,                 // dmg
         0,                 // id
-        30,                // baseCooldown
+        10,                // baseCooldown
         0,                 // cooldown
-        300,               // acceleration
-        1200,              // maxSpeed
+        900,               // acceleration
+        3000,              // maxSpeed
         -1,                // friendlyProjectile
         MELEE,             // type
     },
@@ -301,10 +302,10 @@ const Enemy EnemyPresets[] = {
         100,               // hp
         20,                // dmg
         0,                 // id
-        240,               // baseCooldown
+        55,                // baseCooldown
         0,                 // cooldown
-        100,               // acceleration
-        400,               // maxSpeed
+        400,               // acceleration
+        1500,              // maxSpeed
         -1,                // friendlyProjectile
         MIDRANGE,          // type
     },
@@ -320,10 +321,10 @@ const Enemy EnemyPresets[] = {
         50,                // hp
         35,                // dmg
         0,                 // id
-        300,               // baseCooldown
+        75,                // baseCooldown
         0,                 // cooldown
-        100,               // acceleration
-        400,               // maxSpeed
+        500,               // acceleration
+        1200,              // maxSpeed
         -1,                // friendlyProjectile
         SNIPER,            // type
     },
@@ -379,8 +380,8 @@ const Enemy EnemyPresets[] = {
         -1,                // id
         0,                 // baseCooldown
         0,                 // cooldown
-        2000,              // acceleration
-        4000,              // maxSpeed
+        4000,              // acceleration
+        8000,              // maxSpeed
         1,                 // friendlyProjectile
         F_PROJECTILE,      // type
     },
@@ -398,8 +399,8 @@ const Enemy EnemyPresets[] = {
         -1,                // id
         0,                 // baseCooldown
         0,                 // cooldown
-        2000,              // acceleration
-        4000,              // maxSpeed
+        4000,              // acceleration
+        7000,              // maxSpeed
         0,                 // friendlyProjectile
         E_PROJECTILE,      // type
     }

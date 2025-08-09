@@ -33,6 +33,7 @@ int main(void)
     int currentMap = 0;
     int currentwpn = 0;
     int remainingEnemies = 0;
+    int specialFlag = 0;
 
     while (!WindowShouldClose())
     {
@@ -48,6 +49,12 @@ int main(void)
         drawScene(&player, (void **)enemyData, mp->enemyCount, (void **)hits, NUM_RAYS, (void **)projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
 
         drawMenu(gameState);
+
+        if (gameState != MAINMENU)
+        {
+            drawWeapon(weapons, currentwpn);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+        }
 
         // Switch between the different states
         switch (gameState)
@@ -115,10 +122,10 @@ int main(void)
             }
 
             for (int i = 0; i < ENEMY_UPDATES_PER_FRAME; i++)
-                updateEnemies(mp->enemies, mp->enemyCount, &player, &weapons[1], &weapons[2], 60, FOV, mp, mp->walls, mp->numOfWalls);
+                updateEnemies(&player, &weapons[1], &weapons[2], FPS_TARGET, FOV, mp);
 
             for (int i = 0; i < PROJECTILE_UPDATES_PER_FRAME; i++)
-                updateProjectiles(mp->projectiles, &player, mp->enemies, mp->enemyCount, &weapons[2], &mp->ppointer);
+                updateProjectiles(&player, &weapons[2], mp);
 
             break;
 
@@ -158,13 +165,11 @@ int main(void)
                 player.pos = STARTPOS;
                 player.dir = (Vec2){0.0, 1.0};
 
-
                 freeMap(mp);                    // Unload old map
                 mp = loadMap(Maps[currentMap]); // load next Map
                 weapons[2].projectiles = mp->projectiles;
                 currentwpn = 0;
-
-
+                specialFlag = 1;
                 break; // Extra just in case
             }
 
@@ -205,15 +210,10 @@ int main(void)
         default:
             break;
         }
-        if (gameState != MAINMENU)
-        {
-            drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
-        }
 
         // Always clean memory
         freeCollisionData(hits, NUM_RAYS);
-        freeCollisionData(enemyData, mp->enemyCount);
+        (!specialFlag) ? freeCollisionData(enemyData, mp->enemyCount) : (specialFlag = 0);
         freeCollisionData(projectileData, MAXPROJECTILES);
         EndDrawing();
     }
@@ -226,6 +226,7 @@ int main(void)
     UnloadImage(floorTexture);
 
     freeMap(mp);
+    destroySprites();
 
     CloseWindow();
 

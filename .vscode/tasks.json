@@ -16,7 +16,7 @@
                 "src/sprites.c",
                 "src/screen.c",
                 "-Iinclude",
-                "-Llib",
+                "-Llib/Win64",
                 "-lraylib",
                 "-lopengl32",
                 "-lgdi32",

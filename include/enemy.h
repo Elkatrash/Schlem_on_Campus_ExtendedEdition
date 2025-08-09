@@ -1,12 +1,15 @@
 #include "raycast.h"
 #include "movement.h"
+#include "config.h"
 #ifndef ENEMY
 #define ENEMY
 
 // Clamp a value within a range
 #define CLAMP(x, lower, upper) ((x) < (lower) ? (lower) : ((x) > (upper) ? (upper) : (x)))
 
+#ifndef CONFIG_H
 #define ENEMY_UPDATES_PER_FRAME 60
+#endif
 
 typedef enum Visibility // To see if an enemy should be drawn on the screen or not
 {
@@ -61,7 +64,7 @@ typedef struct Map Map;
 // Shoots a projectile
 void shootProjectile(Vec2 pos, Vec2 dir, int dmg, Enemy **projectiles, int *ppointer, int friendly);
 // Checks if enemy is in players field of view
-int inFieldOfView(Vec2 playerpos, Vec2 playerdir, float FOV, Enemy foe1);
+int inFieldOfView(Vec2 playerpos, Vec2 playerdir, float fov, Enemy foe1);
 // Checks if there is a clear line of sight between a player and enemy. If not then Collisiondata* == NULL
 CollisionData **rayShotEnemies(Player p1, float fov, Map *mp, Enemy *enemies, int ec);
 // Shoots from the enemys point of view so it ignores the fov and such
@@ -69,9 +72,9 @@ CollisionData **rayShotPlayer(Enemy foe, Player p1, Map *mp);
 // Applies a force to an enemy in the dir direction.
 void moveEnemy(Enemy *foe, Vec2 dir, int targetFPS, Wall *walls, int wallcount);
 // Updates an enemy
-void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int *pieAmmo, int targetFPS, float fov, Map *mp, int numOfEnemy, Wall *walls, int wallcount);
+void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int *pieAmmo, int targetFPS, float fov, Map *mp, Wall *walls, int wallcount);
 // Handles a the queue of enemies to be updated
-void updateEnemies(Enemy *Queue, int qSize, Player *p1, Weapon *k_pist, Weapon *pie, int targetFPS, float fov, Map *mp, Wall *walls, int wallcount);
+void updateEnemies(Player *p1, Weapon *k_pist, Weapon *pie, int targetFPS, float fov, Map *mp);
 // Counts live hostile enemies
 int countHostiles(Map *mp);
 

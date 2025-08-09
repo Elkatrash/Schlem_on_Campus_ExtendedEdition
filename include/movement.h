@@ -1,13 +1,22 @@
 #include "raycast.h"
+#include "config.h"
 
+#ifndef CONFIG_H
 // player maxhp
 #define MAXHP 100
-#define STARTPOS (Vec2){0.0, 0.0}
-#define MAXSPEED 420 // lol
+#define MAXSPEED 800
 #define MAXPROJECTILES 30
 #define PROJECTILE_UPDATES_PER_FRAME 10
 // How fast character rotates
 #define ROTSPEED PI / 80
+#define PITYHITRADIUS 3.0
+#endif
+
+#ifdef TAMEMODE
+#define TAME 1
+#else
+#define TAME 0
+#endif
 
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -15,6 +24,7 @@
 
 #ifndef MOVEMENT_H
 #define MOVEMENT_H
+#define STARTPOS (Vec2){0.0, 0.0}
 
 typedef struct
 {
@@ -82,7 +92,7 @@ void shootProjectile(Vec2 pos, Vec2 dir, int dmg, Enemy **projectiles, int *ppoi
 // Moves the projectile and checks if it has hit an enemy
 int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec);
 // Goes through all the projectiles and updates them
-void updateProjectiles(Enemy **projectiles, Player *player, Enemy *enemies, int ec, Weapon *wpn, int *ppointer);
+void updateProjectiles(Player *player, Weapon *wpn, Map *mp);
 // Attacks depending on which weapon you're holding
 void attackEnemy(Weapon *wpn, Player *player, Map *mp);
 // Initializes all the weapons

@@ -4,6 +4,8 @@
 #include "enemy.h"
 #include "map.h"
 #include "sprites.h"
+#include "screen.h"
+#include <limits.h>
 
 void wishMoveForward(Player *player)
 {
@@ -142,7 +144,7 @@ void executeMovement(Player *player, Wall *walls, int wallcount)
     {
         normalize(&wish_dir);
     }
-    float accel_speed = MAXSPEED * 0.1 / 60;
+    float accel_speed = MAXSPEED * 0.1 / FPS_TARGET;
     vectorScale(wish_dir, accel_speed, &wish_dir);
     vectorAdd(old_vel, wish_dir, &new_vel);
     vectorScale(new_vel, 0.9, &new_vel);
@@ -229,7 +231,7 @@ void shootEnemy(Player *player, Enemy *enemy, Wall *walls, int wallcount, int dm
     }
     if (nbwall == wallcount) // if there isn't a wall in the way
     {
-        if (lenFromPointToLine(enemy->pos, vecsToLine(player->pos, player_look)) < enemy->hitRadius) // if the player is pointing to the enemy sprite (With some slight tolerance)
+        if (lenFromPointToLine(enemy->pos, vecsToLine(player->pos, player_look)) < (enemy->hitRadius + PITYHITRADIUS)) // if the player is pointing to the enemy sprite (With some slight tolerance)
         {
             enemy->hp -= dmg; // damage enemy
         }
@@ -284,7 +286,7 @@ void attackEnemy(Weapon *wpn, Player *player, Map *mp)
             Vec2 diffvec;
             vectorSub(mp->enemies[i].pos, player->pos, &diffvec);
             float ds = vectorLenght(diffvec);
-            if ((ds - 30.0) < mp->enemies[i].hitRadius)
+            if ((ds - 33.0) < mp->enemies[i].hitRadius)
                 shootEnemy(player, mp->enemies + i, mp->walls, mp->numOfWalls, wpn->dmg);
         }
         break;
@@ -335,8 +337,8 @@ int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec)
     default:
         break;
     }
-    moveEnemy(projectile, projectile->dir, 60, NULL, 0); // Move the projectile
-    vectorSub(projectile->pos, player->pos, &diffvec);   // Check if the projectile is too far away from the player
+    moveEnemy(projectile, projectile->dir, FPS_TARGET, NULL, 0); // Move the projectile
+    vectorSub(projectile->pos, player->pos, &diffvec);           // Check if the projectile is too far away from the player
     if (vectorLenght(diffvec) >= 2000)
     {
         return 1; // Signal to updateProjectiles that it should free and NULL it
@@ -344,8 +346,12 @@ int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec)
     return 0;
 }
 
-void updateProjectiles(Enemy **projectiles, Player *player, Enemy *enemies, int ec, Weapon *wpn, int *ppointer)
+void updateProjectiles(Player *player, Weapon *wpn, Map *mp)
 {
+    Enemy **projectiles = mp->projectiles;
+    int *ppointer = &mp->ppointer;
+    Enemy *enemies = mp->enemies;
+    int ec = mp->enemyCount;
 
     if (projectiles[*ppointer]) // if the current queue slot contains anything
     {
@@ -366,13 +372,20 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     if (!wps)
         return NULL;
 
+    float fistScale;
+    float smgScale;
+    float smgPos;
+    fistScale = (TAME) ? 0.4 : 0.6;
+    smgScale = (TAME) ? 0.6 : 0.8;
+    smgPos = (TAME) ? 4.0 : 5.0;
+
     // Make the fist weapon
-    wps[0].normalSprite = LoadTexture("Data/Sprites/Weapons/Fist1transp.png");
-    wps[0].shootingSprite = LoadTexture("Data/Sprites/Weapons/Fist2transp.png");
+    wps[0].normalSprite = Sprites[WEAPON_FIST_IDLE];
+    wps[0].shootingSprite = Sprites[WEAPON_FIST_PUNCH];
     wps[0].baseCooldown = 15;
     wps[0].currentCooldown = 0;
     wps[0].screenPos = (Vec2){width * 0.5, 0};
-    wps[0].normalScale = (Vec2){0.6 * width / 800.0, 0.6 * width / 800.0};
+    wps[0].normalScale = (Vec2){fistScale * width / 800.0, fistScale * width / 800.0};
     wps[0].shootingScale = (Vec2){0.8 * width / 800.0, 0.8 * width / 800.0};
     wps[0].ppointer = 0;
     wps[0].projectiles = NULL;
@@ -381,13 +394,13 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[0].dmg = 30;
 
     // Make the smg
-    wps[1].normalSprite = LoadTexture("Data/Sprites/Weapons/kpisttransp.png");
-    wps[1].shootingSprite = LoadTexture("Data/Sprites/Weapons/kpist2transp.png");
+    wps[1].normalSprite = Sprites[WEAPON_KPIST_IDLE];
+    wps[1].shootingSprite = Sprites[WEAPON_KPIST_SHOOT];
     wps[1].baseCooldown = 15;
     wps[1].currentCooldown = 0;
-    wps[1].screenPos = (Vec2){width / 5.0, 0};
-    wps[1].normalScale = (Vec2){0.8 * width / 800.0, 0.8 * width / 800.0};
-    wps[1].shootingScale = (Vec2){0.8 * width / 800.0, 0.8 * width / 800.0};
+    wps[1].screenPos = (Vec2){width / smgPos, 0};
+    wps[1].normalScale = (Vec2){smgScale * width / 800.0, smgScale * width / 800.0};
+    wps[1].shootingScale = (Vec2){smgScale * width / 800.0, smgScale * width / 800.0};
     wps[1].ppointer = 0;
     wps[1].projectiles = NULL;
     wps[1].type = HITSCAN;
@@ -395,8 +408,8 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[1].dmg = 20;
 
     // Make the pie
-    wps[2].normalSprite = LoadTexture("Data/Sprites/Weapons/Projectile1transp.png");
-    wps[2].shootingSprite = LoadTexture("Data/Sprites/Weapons/Fist2transp.png");
+    wps[2].normalSprite = Sprites[WEAPON_PIE_IDLE];
+    wps[2].shootingSprite = Sprites[WEAPON_PIE_SHOOT];
     wps[2].baseCooldown = 15;
     wps[2].currentCooldown = 0;
     wps[2].screenPos = (Vec2){width * 0.5, 0};
