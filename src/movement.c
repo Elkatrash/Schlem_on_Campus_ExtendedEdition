@@ -371,13 +371,20 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     if (!wps)
         return NULL;
 
+    float fistScale;
+    float smgScale;
+    float smgPos;
+    fistScale = (TAME) ? 0.4 : 0.6;
+    smgScale = (TAME) ? 0.6 : 0.8;
+    smgPos = (TAME) ? 4.0 : 5.0;
+
     // Make the fist weapon
     wps[0].normalSprite = Sprites[WEAPON_FIST_IDLE];
     wps[0].shootingSprite = Sprites[WEAPON_FIST_PUNCH];
     wps[0].baseCooldown = 15;
     wps[0].currentCooldown = 0;
     wps[0].screenPos = (Vec2){width * 0.5, 0};
-    wps[0].normalScale = (Vec2){0.6 * width / 800.0, 0.6 * width / 800.0};
+    wps[0].normalScale = (Vec2){fistScale * width / 800.0, fistScale * width / 800.0};
     wps[0].shootingScale = (Vec2){0.8 * width / 800.0, 0.8 * width / 800.0};
     wps[0].ppointer = 0;
     wps[0].projectiles = NULL;
@@ -390,9 +397,9 @@ Weapon *getWeapons(int width, int height, Enemy **projectiles)
     wps[1].shootingSprite = Sprites[WEAPON_KPIST_SHOOT];
     wps[1].baseCooldown = 15;
     wps[1].currentCooldown = 0;
-    wps[1].screenPos = (Vec2){width / 5.0, 0};
-    wps[1].normalScale = (Vec2){0.8 * width / 800.0, 0.8 * width / 800.0};
-    wps[1].shootingScale = (Vec2){0.8 * width / 800.0, 0.8 * width / 800.0};
+    wps[1].screenPos = (Vec2){width / smgPos, 0};
+    wps[1].normalScale = (Vec2){smgScale * width / 800.0, smgScale * width / 800.0};
+    wps[1].shootingScale = (Vec2){smgScale * width / 800.0, smgScale * width / 800.0};
     wps[1].ppointer = 0;
     wps[1].projectiles = NULL;
     wps[1].type = HITSCAN;

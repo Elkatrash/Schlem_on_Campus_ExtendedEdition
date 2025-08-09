@@ -53,10 +53,10 @@ const char *SpritePaths[] = {
     "Data/Sprites/HUD/Weaponselect3.png",
     "Data/Sprites/HUD/85ed57ab85bbe08a0edfd3cfa5edfc38.jpg",
 
-    "Data/Sprites/Weapons/Fist1transp.png",
+    FIST1,
     "Data/Sprites/Weapons/Fist2transp.png",
     "Data/Sprites/Weapons/kpisttransp.png",
-    "Data/Sprites/Weapons/Tame Weapons/kpist2transpVar.png",
+    KPIST2,
     "Data/Sprites/Weapons/Projectile1transp.png",
     "Data/Sprites/Weapons/Fist2transp.png",
 

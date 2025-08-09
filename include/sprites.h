@@ -1,6 +1,7 @@
 #ifndef SPRITES_H
 #define SPRITES_H
 #include <raylib.h>
+#include "config.h"
 
 int initSprites();
 
@@ -45,5 +46,13 @@ typedef enum SpriteNames
 
 extern const char *SpritePaths[];
 extern Texture2D Sprites[];
+
+#ifdef TAMEMODE
+#define FIST1 "Data/Sprites/Weapons/Tame Weapons/Fist1transp.png"
+#define KPIST2 "Data/Sprites/Weapons/Tame Weapons/kpist2transpVar.png"
+#else
+#define FIST1 "Data/Sprites/Weapons/Fist1transp.png"
+#define KPIST2 "Data/Sprites/Weapons/kpist2transp.png"
+#endif
 
 #endif

@@ -12,6 +12,12 @@
 #define PITYHITRADIUS 3.0
 #endif
 
+#ifdef TAMEMODE
+#define TAME 1
+#else
+#define TAME 0
+#endif
+
 #ifndef MIN
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #endif
