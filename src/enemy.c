@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "map.h"
 #include "sprites.h"
+#include <limits.h>
 
 #define PLACEHOLDERRADIUS 1.0f
 

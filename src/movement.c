@@ -5,6 +5,7 @@
 #include "map.h"
 #include "sprites.h"
 #include "screen.h"
+#include <limits.h>
 
 void wishMoveForward(Player *player)
 {
