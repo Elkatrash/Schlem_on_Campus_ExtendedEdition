@@ -9,6 +9,7 @@
 #define NUM_RAYS SCREEN_WIDTH
 #define FOV 90.0f
 #define FPS_TARGET 120
+#define CROSSHAIRSCALE 1.5
 #endif
 
 typedef enum

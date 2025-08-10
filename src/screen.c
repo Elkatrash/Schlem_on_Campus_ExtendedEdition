@@ -100,8 +100,10 @@ void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies)
     sprintf(buffer, "HP: %d", player1.hp);
     DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 200, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
 
-    sprintf(buffer, "+");
-    DrawText(buffer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 20, (Color){245, 40, 145, 204});
+    const char *crosshair = "+";
+    int crosshairSize = (int)(20 * CROSSHAIRSCALE);
+
+    DrawText(crosshair, (SCREEN_WIDTH / 2) - (MeasureText(crosshair, crosshairSize) / 2), (SCREEN_HEIGHT / 2) - (crosshairSize / 2), crosshairSize, (Color){245, 40, 145, 204});
 
     if (wpnn == 0)
         sprintf(buffer, "AMMO: inf");
@@ -297,43 +299,54 @@ void drawScene(void *player, void **enemyData, int enemycount, void **wallData, 
 
 void drawMenu(GameState gameState)
 {
-    const char *exit = "Exit game [ Backspace ]";
-    const char *ret = "Main Menu [ Esc ]";
+    const char *exit = "Exit game [ EXIT ]";
+    const char *ret = "Main Menu [ PauseKey ]";
+    Vector2 retSize = MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5);
+
     switch (gameState)
     {
     case MAINMENU:
         // Show main menu
         const char *title = "Schlem on Campus";
-        const char *start = "Start Game [ Enter ]";
-        DrawTextEx(textFont, title, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, title, textFont.baseSize * 10, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 10, 10, BLACK);
-        DrawTextEx(textFont, start, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, start, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
+        const char *start = "Start Game [ PlayButton ]";
+
+        Vector2 titleSize = MeasureTextEx(jupiter, title, jupiter.baseSize * 10, 10);
+
+        DrawRectangle(SCREEN_WIDTH / 2 - titleSize.x / 2 - 20, SCREEN_HEIGHT / 6 - 20, titleSize.x + 40, SCREEN_HEIGHT / 2, BLACK);
+
+        DrawTextEx(jupiter, title, (Vector2){SCREEN_WIDTH / 2 - titleSize.x / 2, SCREEN_HEIGHT / 6}, jupiter.baseSize * 10, 10, CERISE);
+        DrawTextEx(textFont, start, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, start, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 2 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, CERISE);
         break;
     case GAMEPLAY:
         break;
     case PAUSEMENU:
         // Show pause menu
-        const char *resume = "Resume [ Esc ]";
-        const char *main = "Main Menu [ Enter ]";
-        DrawTextEx(textFont, resume, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, resume, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, main, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, main, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        const char *resume = "Resume [ PauseKey ]";
+        const char *main = "Main Menu [ PlayButton ]";
+        Vector2 mainSize = MeasureTextEx(textFont, main, textFont.baseSize * 5, 5);
+
+        DrawRectangle(SCREEN_WIDTH / 2 - mainSize.x / 2 - 20, SCREEN_HEIGHT / 6 - 20, mainSize.x + 40, textFont.baseSize * 15 + 40, BLACK);
+
+        DrawTextEx(textFont, resume, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, resume, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, main, (Vector2){SCREEN_WIDTH / 2 - mainSize.x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, CERISE);
         break;
 
     case ENDSCREEN:
         // Show end of level screen
-        const char *next = "Next level [ Enter ]";
+        const char *next = "Next level [ PlayButton ]";
         DrawTextEx(textFont, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, next, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - retSize.x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
         DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
         break;
     case DEATHSCREEN:
         // Show death screen
         const char *dead = "YOU DIED";
-        const char *retry = "Restart [ Enter ]";
+        const char *retry = "Restart [ PlayButton ]";
         DrawTextEx(textFont, dead, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, dead, textFont.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, textFont.baseSize * 8, 8, BLACK);
         DrawTextEx(textFont, retry, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, retry, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - retSize.x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
         DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15}, textFont.baseSize * 5, 5, BLACK);
         break;
     case THEEND:
@@ -342,7 +355,7 @@ void drawMenu(GameState gameState)
         const char *congrts = "CONGRATULATIONS ON FINISHING THE GAME";
         DrawTextEx(textFont, won, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, won, textFont.baseSize * 8, 5).x / 2, SCREEN_HEIGHT / 10}, textFont.baseSize * 8, 8, CERISE);
         DrawTextEx(textFont, congrts, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, congrts, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, CERISE);
-        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, ret, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - retSize.x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
         DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15}, textFont.baseSize * 5, 5, BLACK);
         break;
 
