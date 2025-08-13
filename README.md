@@ -25,5 +25,5 @@ There is a `build.sh` script that should download needed dependencies, build and
 * Other [Dante](https://github.com/Elkatrash)
 
 ### Third-Party libraries
-This project uses [Raylib 5.5](https://github.com/raysan5/raylib/releases/tag/5.5) Copyright (c) 2013–2025 Ramon Santamaria under the [zlib/libpng License](Docs\RAYLIB_LICENSE.txt) 
+This project uses [Raylib 5.5](https://github.com/raysan5/raylib/releases/tag/5.5) Copyright (c) 2013–2025 Ramon Santamaria under the [zlib/libpng License](Docs\RAYLIB_LICENSE.txt). The files in `lib/` are all from there as well as   `raylib.h`, `raymath.h`, `rlgl.h` and `rcamera.h`.
 
