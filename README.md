@@ -1,55 +1,29 @@
-# Resultat
-## Hur man kör spelet:
-Öppna schlem.exe
+# Schlem on Campus Extended Edition
+## Summary
+Schlem on campus is a doom/wolfenstein like game originally created as an INDA-project during spring 2025 on KTH. The game is somewhat inspired by mottagningen. 
+## Extended edition
+[Dante](https://github.com/Elkatrash) aka `Elkatrash`, a member from the original INDA-project group chose to improve on the game during the summer of 2025 and has thus created the Extended edition which consists mostly of bugfixes and code refactoring. 
+## How to run the game
+There is no game binary or executable in the repo you will have to compile the code on your own. For this you will need a C compiler since the game is entirely written in C. If you want to change options such as targetfps or fov you can change them in `/include/config.h`. Note that you will need to recompile the game in order for the settings to change. 
+### Compilation for Windows
+* The easiest option is to open the repo in `vscode` and press `ctrl+shift+B`. The included `/.vscode/tasks.json` should be able to compile it directly. 
+* Another option is to open `cmd` in the repo directory and run this command `gcc -g -Wall src/main.c src/map.c src/enemy.c src/movement.c src/raycast.c src/sprites.c src/screen.c -Iinclude -Llib/Win64 -lraylib -lopengl32 -lgdi32 -lwinmm -o main.exe`
 
-## Vad som finns:
-Spelet är nu klart och inkluderar en texturerad raycaster med olika egengjorda texturer för fiender och vägar. Det finns även tre olika fiende arketyper för spelaren att ta an, närstrid, medeldistans och långdistans. Spelaren har också tillgång till tre olika vapen, knyttnäve, k-pist och paj. Det finns även pickups som spelaren kan plocka upp för hälsa eller ammunition. Informationen om spelaren situation finns tillgänglig i en HUD, som visar hälsa, ammo och hur många fiender som finns kvar på leveln. När spelaren besegrat alla fiender så rör man sig vidare till nästa nivå, det finns totalt 4 nivåer med växande svårighetsgrad. 
+If you have trouble with your compiler for windows I recommend getting it from [here](https://winlibs.com). Download the latest `Win64` Zip archive and extract the mingw64 to somewhere (I put it in `c:\`). Then add the `mingw64/bin` directory to your `Path environment variable`.
+### Compilation for Linux
+There is a build.sh script that should download needed dependencies, build and run the game. Just run that. If that doesn't work ask chatgpt. Here is a usefull prompt: `How do I compile a raylib game, written in c,  on (insert distro here). The source files are in /src the headers are in /include and the library binaries are in lib/Lin64.` 
 
-Det finns även menyer för när man startar, pausar, dör eller vinner. 
-- Startmenyn låter spelaren gå in i första nivån eller stänga ner spelet. 
-- Pausmenyn låter spelaren stänga ner spelet, gå tillbaka till startmenyn, eller återvända till spelet. 
-- Dödsmenyn låter spelaren gå tillbaka till startmenyn eller börja om.
-- Vinstmenyn låter spelaren gå tillbaka till menyn eller gå vidare till nästa nivå.
-- Slutmenyn visas när man klarar sista nivån och då kan man återgå till huvudmenyn.
+## Credits
+### Original code, maps and design
+* [Dante](https://github.com/Elkatrash)
+* [Linus](https://github.com/LinusBredin)
+* [Ludvig](https://github.com/Ludvig850)
 
-## Förklaring av våra filer:
-- Main: Huvudspelloopen, ritandet, menyer
-- Map: Maploading, pickups
-- Enemy: Logik för fiender
-- Movement: Spelarlogik, Vapenlogik
-- Raycast: Vectorlogik/matte, Raylogik
-- Raylib: Ritarlogik, inputs, Spelframework (Kommer från https://www.raylib.com/index.html) 
+### Sprites and textures
 
-## Hur man kompilerar spelet:
-Skriv in i terminalen:
-gcc main.c raycast.c map.c movement.c enemy.c -o schlem.exe -Iinclude -Llib -lraylib -lopengl32 -lgdi32 -lwinmm 
+* Pickups [Ludvig](https://github.com/Ludvig850)
+* Other [Dante](https://github.com/Elkatrash)
 
-(Se till att ha rätt compiler: https://winlibs.com )
+### Third-Party libraries
+This project uses [Raylib 5.5](https://github.com/raysan5/raylib/releases/tag/5.5) Copyright (c) 2013–2025 Ramon Santamaria under the [zlib/libpng License](Docs\RAYLIB_LICENSE.txt) 
 
----
-# Planen
-
-## Vad vi ska göra
-Vi ska göra en enkel Doom Clone. Målet är att låta spelaren gå runt i en bana som är visad med en texturerad raycaster. Det ska finns fiender som kan skjuta och bli skjutna av spelaren. Det ska även finnas en enkel HUD som visar spelarens hälsa och ammunition.
-
-Om det finns tid planerar vi att implementera pickups för hälsa och ammo, ljudeffekter, egna texturer, en startmeny samt en culling-funktion för att förbättra prestanda.
-
-Ifall vi blir klara med allt detta planerar vi att implementera förmågan att åka upp och ner samt en map creator.
-
-## Språk och verktyg
-Vi skriver i C, med grafiksbiblioteket raylib. Det ska vara kompatibelt med åtminstone Linux.
-
-
-## Naming conventions
-
-Allt skrivs på engelska. Vi använder camelcase för funktioner, små bokstäver för variabler och stora bokstäver för konstanter. Typedefs (egna datatyper) är PascalCase. Filnamn är lowercase.
-
-
-Branches döps efter funktionen som ska implementeras. Issues skrivs med instruktion först och problemet efter, till exempel: “Fix: Walls won’t load”. Commits skrivs som till exempel: “Fixed: Walls won’t load” eller “Added: Raycaster”
-
-## Workflow
-
-Branches bör godkännas av åtminstone en annan gruppmedlem innan de mergas. Projektet börjar med att all jobbar på grunderna. Sedan delar vi upp arbetet mer ordetligt.
-
-## Uppdelning av arbete 
-Se github Issues. 
