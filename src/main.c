@@ -11,7 +11,7 @@ int main(void)
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Schlem on Campus");
     SetTargetFPS(FPS_TARGET);
     srand(time(NULL));
-    SetExitKey(KEY_BACKSPACE); // set close program key, so esc can be used for pause
+    SetExitKey(KEYBIND_EXIT); // set close program key, so esc can be used for pause
     ToggleFullscreen();
     HideCursor();
 
@@ -34,6 +34,7 @@ int main(void)
     int currentwpn = 0;
     int remainingEnemies = 0;
     int specialFlag = 0;
+    int swapCooldown = 0;
 
     while (!WindowShouldClose())
     {
@@ -61,7 +62,7 @@ int main(void)
         {
         case MAINMENU:
 
-            if (IsKeyPressed(KEY_ENTER))
+            if (IsKeyPressed(KEYBIND_PLAY))
             {
                 gameState = GAMEPLAY;
                 player.pos = STARTPOS;
@@ -79,35 +80,48 @@ int main(void)
             if (weapons[currentwpn].currentCooldown > 0)
                 weapons[currentwpn].currentCooldown--;
 
-            if (IsKeyPressed(KEY_ESCAPE))
+            if (IsKeyPressed(KEYBIND_PAUSE))
             {
                 gameState = PAUSEMENU;
             }
 
-            if (IsKeyDown(KEY_RIGHT))
+            if (IsKeyDown(KEYBIND_TURNRIGHT))
                 rotateRight(&player);
-            if (IsKeyDown(KEY_LEFT))
+            if (IsKeyDown(KEYBIND_TURNLEFT))
                 rotateLeft(&player);
-            if (IsKeyDown('W'))
+            if (IsKeyDown(KEYBIND_MOVEFORWARD))
                 wishMoveForward(&player);
-            if (IsKeyDown('A'))
+            if (IsKeyDown(KEYBIND_MOVELEFT))
                 wishMoveLeft(&player);
-            if (IsKeyDown('S'))
+            if (IsKeyDown(KEYBIND_MOVEBACKWARD))
                 wishMoveBack(&player);
-            if (IsKeyDown('D'))
+            if (IsKeyDown(KEYBIND_MOVERIGHT))
                 wishMoveRight(&player);
-            if (IsKeyDown(KEY_SPACE) && weapons[currentwpn].currentCooldown == 0 && weapons[currentwpn].ammo > 0)
+            if (IsKeyDown(KEYBIND_SHOOT) && weapons[currentwpn].currentCooldown == 0 && weapons[currentwpn].ammo > 0)
                 attackEnemy(&weapons[currentwpn], &player, mp);
-            if (IsKeyDown('1'))
+            if (IsKeyDown(KEYBIND_WEAPON1))
                 currentwpn = 0;
-            if (IsKeyDown('2'))
+            if (IsKeyDown(KEYBIND_WEAPON2))
                 currentwpn = 1;
-            if (IsKeyDown('3'))
+            if (IsKeyDown(KEYBIND_WEAPON3))
                 currentwpn = 2;
-            if (IsKeyDown('Q'))
-                weapons[currentwpn].currentCooldown = 1;
-            if (IsKeyDown('E'))
-                weapons[currentwpn].currentCooldown = 0;
+            if (IsKeyDown(KEYBIND_PREVIOUSWEAPON))
+            {
+                if (swapCooldown <= 0)
+                {
+                    currentwpn = (currentwpn >= 1) ? (currentwpn - 1) : (2);
+                    swapCooldown = FPS_TARGET / 5;
+                }
+            }
+            if (IsKeyDown(KEYBIND_NEXTWEAPON))
+            {
+                if (swapCooldown <= 0)
+                {
+                    currentwpn = (currentwpn <= 1 && swapCooldown <= 0) ? (currentwpn + 1) : (0);
+                    swapCooldown = FPS_TARGET / 5;
+                }
+            }
+            swapCooldown--;
 
             executeMovement(&player, mp->walls, mp->numOfWalls);
 
@@ -131,11 +145,11 @@ int main(void)
 
         case PAUSEMENU:
 
-            if (IsKeyPressed(KEY_ESCAPE))
+            if (IsKeyPressed(KEYBIND_PAUSE))
             {
                 gameState = GAMEPLAY;
             }
-            if (IsKeyPressed(KEY_ENTER))
+            if (IsKeyPressed(KEYBIND_PLAY))
             {
                 // Reset player pos and open main menu
                 player.pos = STARTPOS;
@@ -147,11 +161,11 @@ int main(void)
 
         case ENDSCREEN:
 
-            if (IsKeyPressed(KEY_ESCAPE))
+            if (IsKeyPressed(KEYBIND_PAUSE))
             {
                 gameState = MAINMENU;
             }
-            if (IsKeyPressed(KEY_ENTER))
+            if (IsKeyPressed(KEYBIND_PLAY))
             {
                 currentMap++; // Advance to next map
                 if (currentMap == NUM_MAPS)
@@ -176,11 +190,11 @@ int main(void)
             break;
 
         case DEATHSCREEN:
-            if (IsKeyPressed(KEY_ENTER) || IsKeyPressed(KEY_ESCAPE))
+            if (IsKeyPressed(KEYBIND_PLAY) || IsKeyPressed(KEYBIND_PAUSE))
             {
                 currentMap = 0; // Advance to next map
 
-                gameState = (IsKeyPressed(KEY_ESCAPE)) ? MAINMENU : GAMEPLAY;
+                gameState = (IsKeyPressed(KEYBIND_PAUSE)) ? MAINMENU : GAMEPLAY;
                 player = PLAYERINIT; // Reset player
 
                 free(weapons);
@@ -197,7 +211,7 @@ int main(void)
             break;
 
         case THEEND:
-            if (IsKeyPressed(KEY_ESCAPE))
+            if (IsKeyPressed(KEYBIND_PAUSE))
             {
                 // Reset the player and show main menu
                 gameState = MAINMENU;
