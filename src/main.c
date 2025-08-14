@@ -35,6 +35,7 @@ int main(void)
     int remainingEnemies = 0;
     int specialFlag = 0;
     int swapCooldown = 0;
+    int mapTimeFrames = 0;
 
     while (!WindowShouldClose())
     {
@@ -54,7 +55,7 @@ int main(void)
         if (gameState != MAINMENU)
         {
             drawWeapon(weapons, currentwpn);
-            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies);
+            drawHud(&player, &weapons[currentwpn], currentwpn, remainingEnemies, mapTimeFrames);
         }
 
         // Switch between the different states
@@ -141,6 +142,7 @@ int main(void)
             for (int i = 0; i < PROJECTILE_UPDATES_PER_FRAME; i++)
                 updateProjectiles(&player, &weapons[2], mp);
 
+            mapTimeFrames++;
             break;
 
         case PAUSEMENU:
@@ -168,6 +170,7 @@ int main(void)
             if (IsKeyPressed(KEYBIND_PLAY))
             {
                 currentMap++; // Advance to next map
+                mapTimeFrames = 0;
                 if (currentMap == NUM_MAPS)
                 {
                     gameState = THEEND;
@@ -193,6 +196,7 @@ int main(void)
             if (IsKeyPressed(KEYBIND_PLAY) || IsKeyPressed(KEYBIND_PAUSE))
             {
                 currentMap = 0; // Advance to next map
+                mapTimeFrames = 0;
 
                 gameState = (IsKeyPressed(KEYBIND_PAUSE)) ? MAINMENU : GAMEPLAY;
                 player = PLAYERINIT; // Reset player
@@ -218,6 +222,7 @@ int main(void)
                 player = PLAYERINIT;
                 free(weapons);
                 weapons = getWeapons(SCREEN_WIDTH, SCREEN_HEIGHT, mp->projectiles);
+                mapTimeFrames = 0;
             }
 
             break;

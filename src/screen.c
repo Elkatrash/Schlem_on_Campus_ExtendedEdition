@@ -49,7 +49,7 @@ void drawWeapon(void *wpns, int wpnid)
     }
 }
 
-void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies)
+void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies, int frames)
 {
     Player player1 = *(Player *)player;
 
@@ -94,6 +94,7 @@ void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies)
     DrawRectangle(((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 300, 90 * hudHeightScale - 8, BLACK);
     DrawRectangle(((SCREEN_WIDTH - Sprites[UI_GUY].width * hudHeightScale) / 2) - 204, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 200, 90 * hudHeightScale - 8, BLACK);
     DrawRectangle(4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, 450, 90 * hudHeightScale - 8, BLACK);
+    DrawRectangle(SCREEN_WIDTH - MeasureText("1234.5", 75) - 4, SCREEN_HEIGHT - 90 * hudHeightScale + 4, MeasureText("1234.5", 75), 90 * hudHeightScale - 8, BLACK);
 
     // Draw some text in the squares
     char buffer[64];
@@ -105,15 +106,15 @@ void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies)
 
     DrawText(crosshair, (SCREEN_WIDTH / 2) - (MeasureText(crosshair, crosshairSize) / 2), (SCREEN_HEIGHT / 2) - (crosshairSize / 2), crosshairSize, (Color){245, 40, 145, 204});
 
-    if (wpnn == 0)
-        sprintf(buffer, "AMMO: inf");
-    else
-        sprintf(buffer, "AMMO: %d", wpn.ammo);
+    (wpnn == 0) ? sprintf(buffer, "AMMO: inf") : sprintf(buffer, "AMMO: %d", wpn.ammo);
 
     DrawTextEx(jupiter, buffer, (Vector2){((SCREEN_WIDTH + Sprites[UI_GUY].width * hudHeightScale) / 2) + Sprites[UI_SELECT1].width + 8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
 
     sprintf(buffer, "REMAINING Oan: %d", remaingingEnemies);
     DrawTextEx(jupiter, buffer, (Vector2){8, SCREEN_HEIGHT - 90 * hudHeightScale + 4}, 75, 2, RED);
+
+    sprintf(buffer, "%.1f", (float)frames / (float)FPS_TARGET);
+    DrawTextEx(jupiter, buffer, (Vector2){SCREEN_WIDTH - MeasureText("1234.5", 75), SCREEN_HEIGHT - 90 * hudHeightScale + 8}, 75, 2, RED);
 }
 
 int compareEnemyDistance(const void *a, const void *b)
