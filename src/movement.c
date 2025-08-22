@@ -308,20 +308,20 @@ void attackEnemy(Weapon *wpn, Player *player, Map *mp)
     wpn->ammo--;                              // lower ammo
 }
 
-int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec)
+int updateProjectile(Enemy *projectile, Player *player, Map *mp)
 {
     Vec2 diffvec;
 
     switch (projectile->friendlyProjectile)
     {
-    case 1:                          // if the projectile is friendly
-        for (int i = 0; i < ec; i++) // check every enemy
+    case 1:                                      // if the projectile is friendly
+        for (int i = 0; i < mp->enemyCount; i++) // check every enemy
         {
-            vectorSub(projectile->pos, enemies[i].pos, &diffvec);
-            if (vectorLenght(diffvec) <= (projectile->attackRadius + enemies[i].hitRadius)) // if enemy is too close to projectile
+            vectorSub(projectile->pos, mp->enemies[i].pos, &diffvec);
+            if (vectorLenght(diffvec) <= (projectile->attackRadius + mp->enemies[i].hitRadius)) // if enemy is too close to projectile
             {
-                enemies[i].hp -= projectile->dmg; // damage enemy
-                return 1;                         // Signal to updateProjectiles that it should free and NULL it
+                mp->enemies[i].hp -= projectile->dmg; // damage enemy
+                return 1;                             // Signal to updateProjectiles that it should free and NULL it
             }
         }
 
@@ -337,9 +337,9 @@ int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec)
     default:
         break;
     }
-    moveEnemy(projectile, projectile->dir, FPS_TARGET, NULL, 0); // Move the projectile
-    vectorSub(projectile->pos, player->pos, &diffvec);           // Check if the projectile is too far away from the player
-    if (vectorLenght(diffvec) >= 2000)
+    int wallCrash = moveEnemy(projectile, projectile->dir, FPS_TARGET, mp->walls, mp->numOfWalls); // Move the projectile
+    vectorSub(projectile->pos, player->pos, &diffvec);                                             // Check if the projectile is too far away from the player
+    if ((vectorLenght(diffvec) >= 2000) || wallCrash)
     {
         return 1; // Signal to updateProjectiles that it should free and NULL it
     }
@@ -350,12 +350,10 @@ void updateProjectiles(Player *player, Weapon *wpn, Map *mp)
 {
     Enemy **projectiles = mp->projectiles;
     int *ppointer = &mp->ppointer;
-    Enemy *enemies = mp->enemies;
-    int ec = mp->enemyCount;
 
     if (projectiles[*ppointer]) // if the current queue slot contains anything
     {
-        if (updateProjectile(projectiles[*ppointer], player, enemies, ec)) // update the projectile and check if it should be removed
+        if (updateProjectile(projectiles[*ppointer], player, mp)) // update the projectile and check if it should be removed
         {
             free(projectiles[*ppointer]);  // deallocate projectile
             projectiles[*ppointer] = NULL; // set spot to null

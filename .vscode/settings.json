@@ -4,6 +4,7 @@
         "algorithm": "c",
         "format": "c",
         "movement.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "enemy.h": "c"
     }
 }

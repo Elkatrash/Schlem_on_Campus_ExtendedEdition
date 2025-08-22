@@ -90,7 +90,7 @@ CollisionData **rayShotProjectile(Player p1, float fov, Map *mp, Enemy **project
 // Creates a projectile that is facing the same direction as the player
 void shootProjectile(Vec2 pos, Vec2 dir, int dmg, Enemy **projectiles, int *ppointer, int friendly);
 // Moves the projectile and checks if it has hit an enemy
-int updateProjectile(Enemy *projectile, Player *player, Enemy *enemies, int ec);
+int updateProjectile(Enemy *projectile, Player *player, Map *mp);
 // Goes through all the projectiles and updates them
 void updateProjectiles(Player *player, Weapon *wpn, Map *mp);
 // Attacks depending on which weapon you're holding

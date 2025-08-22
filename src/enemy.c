@@ -96,8 +96,10 @@ CollisionData **rayShotPlayer(Enemy foe, Player p1, Map *mp)
     return result;
 }
 
-void moveEnemy(Enemy *foe, Vec2 dir, int targetFPS, Wall *walls, int wallcount)
+int moveEnemy(Enemy *foe, Vec2 dir, int targetFPS, Wall *walls, int wallcount)
 {
+    int crashFLag = 0;
+
     // Apply acceleration
     Vec2 acc;
     vectorScale(dir, foe->acceleration / (float)targetFPS, &acc);
@@ -125,6 +127,7 @@ void moveEnemy(Enemy *foe, Vec2 dir, int targetFPS, Wall *walls, int wallcount)
     {
         if (intersect(old_pos, res, walls[i].start, walls[i].stop)) // If broken nose (Walked into the Wall)
         {
+            crashFLag = 1;
             // Lots of linear algebra to try and end up on the right side of the wall
             Vec2 pos_res = VECINIT;
             Vec2 wall_res = VECINIT;
@@ -149,6 +152,7 @@ void moveEnemy(Enemy *foe, Vec2 dir, int targetFPS, Wall *walls, int wallcount)
         }
     }
     foe->pos = res;
+    return crashFLag;
 }
 
 void updateEnemy(Enemy *foe, Player p1, int *playerHealth, int *k_pistAmmo, int *pieAmmo, int targetFPS, float fov, Map *mp, Wall *walls, int wallcount)
