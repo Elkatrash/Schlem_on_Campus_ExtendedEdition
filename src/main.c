@@ -50,7 +50,7 @@ int main(void)
 
         drawScene(&player, (void **)enemyData, mp->enemyCount, (void **)hits, NUM_RAYS, (void **)projectileData, &floorImage, &floorTextureBuffer, floorTexture, roofTexture);
 
-        drawMenu(gameState);
+        drawMenu(gameState, mapTimeFrames);
 
         if (gameState != MAINMENU)
         {

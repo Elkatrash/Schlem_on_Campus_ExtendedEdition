@@ -298,7 +298,7 @@ void drawScene(void *player, void **enemyData, int enemycount, void **wallData, 
     free(allData); // Since we memcpy the only thing stored is pointers to the other pointers and thus the data itself will be freed later
 }
 
-void drawMenu(GameState gameState)
+void drawMenu(GameState gameState, int frames)
 {
     const char *exit = "Exit game [ EXIT ]";
     const char *ret = "Main Menu [ PauseKey ]";
@@ -337,9 +337,20 @@ void drawMenu(GameState gameState)
     case ENDSCREEN:
         // Show end of level screen
         const char *next = "Next level [ PlayButton ]";
-        DrawTextEx(textFont, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, next, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - retSize.x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, BLACK);
-        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, BLACK);
+
+        char score[64];
+
+        sprintf(score, "Time: %.1f", (float)frames / (float)FPS_TARGET);
+
+        Vector2 nextSize = MeasureTextEx(textFont, next, textFont.baseSize * 5, 5);
+
+        DrawRectangle(SCREEN_WIDTH / 2 - nextSize.x / 2 - 20, SCREEN_HEIGHT / 6 - 20, nextSize.x + 40, textFont.baseSize * 20 + 40, BLACK);
+
+        DrawTextEx(textFont, next, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, next, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, ret, (Vector2){SCREEN_WIDTH / 2 - retSize.x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 5}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, exit, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, exit, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 10}, textFont.baseSize * 5, 5, CERISE);
+        DrawTextEx(textFont, score, (Vector2){SCREEN_WIDTH / 2 - MeasureTextEx(textFont, score, textFont.baseSize * 5, 5).x / 2, SCREEN_HEIGHT / 6 + textFont.baseSize * 15 + 5}, textFont.baseSize * 5, 5, CERISE);
+
         break;
     case DEATHSCREEN:
         // Show death screen

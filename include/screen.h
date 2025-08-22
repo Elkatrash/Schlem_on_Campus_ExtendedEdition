@@ -33,6 +33,6 @@ void drawHud(void *player, void *weapon, int wpnn, int remaingingEnemies, int fr
 
 void drawScene(void *player, void **enemyData, int enemycount, void **wallData, int raycount, void **projData, Image *floorImage, Texture2D *floorTextureBuffer, Image floorTexture, Image roofTexture);
 
-void drawMenu(GameState gameState);
+void drawMenu(GameState gameState, int frames);
 
 #endif
